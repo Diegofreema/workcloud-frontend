@@ -1,0 +1,29 @@
+{
+  "cli": {
+    "version": ">= 7.1.2"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "channel": "development"
+    },
+    "preview": {
+      "distribution": "internal",
+      "channel": "preview",
+      "env": {
+        "EXPO_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1ja2toZ214Z2p3amd4d3NzcmZvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDAxMzk4NjksImV4cCI6MjAxNTcxNTg2OX0.f5RhZOj4wLrd6jl9rIFoljlsD4ihZCLKlZnPtcXWxsM",
+        "EXPO_PUBLIC_SUPABASE_URL": "https://mckkhgmxgjwjgxwssrfo.supabase.co",
+        "EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY": "pk_test_aHVnZS1nYXplbGxlLTI5LmNsZXJrLmFjY291bnRzLmRldiQ",
+        "EXPO_PUBLIC_STREAM_API_KEY": "cnvc46pm8uq9",
+        "EXPO_PUBLIC_BACKEND_API": "https://workserver-plum.vercel.app"
+      }
+    },
+    "production": {
+      "channel": "production"
+    }
+  },
+  "submit": {
+    "production": {}
+  }
+}
