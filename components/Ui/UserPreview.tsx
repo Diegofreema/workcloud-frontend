@@ -126,18 +126,9 @@ export const WorkPreview = ({ item }: { item: Requests }) => {
   const { id: userId } = useData();
   const [cancelling, setCancelling] = useState(false);
   const [accepting, setAccepting] = useState(false);
-  const {
-    created_at,
-    id,
-    role,
-    from,
-    to,
-    workspaceId,
-    salary,
-    responsibility,
-    qualities,
-  } = item;
-  console.log(to);
+  const { id, role, from, to, workspaceId, salary, responsibility, qualities } =
+    item;
+  console.log(workspaceId);
 
   const queryClient = useQueryClient();
 
@@ -168,15 +159,7 @@ export const WorkPreview = ({ item }: { item: Requests }) => {
           type: 'success',
           text1: 'Request has been accepted',
         });
-        queryClient.invalidateQueries({
-          queryKey: ['request', from?.userId, to?.userId],
-        });
-        queryClient.invalidateQueries({
-          queryKey: ['single', id],
-        });
-        queryClient.invalidateQueries({
-          queryKey: ['pending_requests', userId],
-        });
+
         router.push('/organization');
       }
       if (error || err) {
@@ -206,16 +189,6 @@ export const WorkPreview = ({ item }: { item: Requests }) => {
         Toast.show({
           type: 'success',
           text1: 'Request Canceled',
-        });
-
-        queryClient.invalidateQueries({
-          queryKey: ['request', from?.userId, to?.userId],
-        });
-        queryClient.invalidateQueries({
-          queryKey: ['single', id],
-        });
-        queryClient.invalidateQueries({
-          queryKey: ['pending_requests', userId],
         });
       }
 
@@ -248,23 +221,23 @@ export const WorkPreview = ({ item }: { item: Requests }) => {
       />
       <VStack mr={10} width={'90%'} justifyContent="space-between" gap={10}>
         <MyText
-          style={{ color: 'black', width: '100%', paddingRight: 5 }}
+          style={{ width: '100%', paddingRight: 5 }}
           poppins="Medium"
           fontSize={12}
         >
           {from?.organizationId?.name} wants you to be a representative on their
           workspace
         </MyText>
-        <MyText style={{ color: 'black' }} poppins="Medium" fontSize={12}>
+        <MyText style={{}} poppins="Medium" fontSize={12}>
           Role : {role}
         </MyText>
-        <MyText style={{ color: 'black' }} poppins="Medium" fontSize={12}>
+        <MyText style={{}} poppins="Medium" fontSize={12}>
           Responsibility : {responsibility}
         </MyText>
-        <MyText style={{ color: 'black' }} poppins="Medium" fontSize={12}>
+        <MyText style={{}} poppins="Medium" fontSize={12}>
           Qualities : {qualities}
         </MyText>
-        <MyText style={{ color: 'black' }} poppins="Medium" fontSize={12}>
+        <MyText style={{}} poppins="Medium" fontSize={12}>
           Payment: {salary} naira
         </MyText>
 

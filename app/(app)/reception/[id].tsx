@@ -30,6 +30,7 @@ import { EmptyText } from '@/components/EmptyText';
 import { useQueryClient } from '@tanstack/react-query';
 import { PostComponent } from '@/components/PostComponent';
 import Carousel from 'react-native-reanimated-carousel';
+import { useDarkMode } from '@/hooks/useDarkMode';
 type Props = {};
 
 const Reception = (props: Props) => {
@@ -37,8 +38,7 @@ const Reception = (props: Props) => {
   const queryClient = useQueryClient();
   const { id } = useLocalSearchParams<{ id: string }>();
   const { data, isPending, error, refetch, isPaused } = useGetOrg(id);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const scrollViewRef = useRef<ScrollView | null>(null);
+
   const {
     data: posts,
     isPending: isPendingPosts,
@@ -64,7 +64,6 @@ const Reception = (props: Props) => {
         .from('connections')
         .select('connectedTo, id')
         .eq('owner', userId);
-      console.log('connected', data);
 
       const connected = data?.find(
         (item) => item?.connectedTo.toString() === id
@@ -95,29 +94,7 @@ const Reception = (props: Props) => {
     };
     createConnection();
   }, [id, userId]);
-  const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const contentOffset = event.nativeEvent.contentOffset;
-    const currentIndex = Math.round(
-      contentOffset.x / Dimensions.get('window').width
-    );
-    setCurrentIndex(currentIndex);
-  };
-  useEffect(() => {
-    const timer = setInterval(() => {
-      if (posts?.imgUrls && currentIndex === posts?.imgUrls?.length - 1) {
-        scrollViewRef?.current?.scrollTo({ x: 0, animated: true });
-        setCurrentIndex(0);
-      } else {
-        scrollViewRef?.current?.scrollTo({
-          x: (currentIndex + 1) * Dimensions.get('window').width,
-          animated: true,
-        });
-        setCurrentIndex(currentIndex + 1);
-      }
-    }, 1500);
 
-    return () => clearInterval(timer);
-  }, [currentIndex]);
   const handleRefetch = () => {
     refetch();
     refetchWorkers();
@@ -140,7 +117,7 @@ const Reception = (props: Props) => {
 
   const { org } = data;
   const { workers: staffs } = workers;
-  console.log(posts?.imgUrls, 'posts');
+  console.log(staffs[0].role, staffs[1].role, 'staffs');
 
   return (
     <ScrollView
@@ -149,7 +126,7 @@ const Reception = (props: Props) => {
       style={{ flex: 1, marginHorizontal: 20 }}
     >
       <HeaderNav title={org?.name} subTitle={org?.category} />
-      <HStack gap={10} alignItems="center" mt={10}>
+      <HStack gap={10} alignItems="center" my={10}>
         <Avatar.Image source={{ uri: org?.avatar }} size={50} />
         <VStack>
           <MyText poppins="Medium" style={{ color: colors.nine }}>
@@ -198,11 +175,10 @@ const Reception = (props: Props) => {
           autoPlay={true}
           data={posts?.imgUrls}
           scrollAnimationDuration={1500}
-          onSnapToItem={(index) => console.log('current index:', index)}
           renderItem={({ index, item }) => (
             <View
               style={{
-                width: width,
+                width: width * 0.98,
                 height: 150,
                 borderRadius: 5,
                 overflow: 'hidden',
@@ -234,15 +210,18 @@ const styles = StyleSheet.create({
 });
 
 const Representatives = ({ data }: { data: WorkerWithWorkspace[] }) => {
+  const { darkMode } = useDarkMode();
+  console.log(data.length, 'data');
+
   return (
     <FlatList
       ListHeaderComponent={() => (
         <Text
           style={{
-            color: 'black',
+            color: darkMode === 'dark' ? 'white' : 'black',
             fontSize: 12,
             fontFamily: 'PoppinsBold',
-            marginBottom: 20,
+            marginVertical: 20,
           }}
         >
           Representatives
@@ -250,6 +229,7 @@ const Representatives = ({ data }: { data: WorkerWithWorkspace[] }) => {
       )}
       scrollEnabled={false}
       data={data}
+      contentContainerStyle={{ paddingBottom: 30 }}
       renderItem={({ item }) => <RepresentativeItem item={item} />}
       ListEmptyComponent={() => <EmptyText text="No representatives yet" />}
       numColumns={3}
@@ -324,7 +304,7 @@ const RepresentativeItem = ({ item }: { item: WorkerWithWorkspace }) => {
   };
   return (
     <Pressable
-      style={({ pressed }) => [{ opacity: pressed ? 0.5 : 1 }]}
+      style={({ pressed }) => [{ opacity: pressed ? 0.5 : 1, flex: 1 }]}
       onPress={handlePress}
     >
       <VStack alignItems="center" justifyContent="center" gap={2}>

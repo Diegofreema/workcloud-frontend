@@ -5,7 +5,7 @@ import { defaultStyle } from '../../../constants';
 import { Header } from '../../../components/Header';
 import { ProfileHeader } from '../../../components/ProfileHeader';
 import { colors } from '../../../constants/Colors';
-import { useGetConnection } from '../../../lib/queries';
+import { useGetConnection, useProfile } from '../../../lib/queries';
 import { useEffect, useState } from 'react';
 import { useOrganizationModal } from '../../../hooks/useOrganizationModal';
 import { OrganizationModal } from '../../../components/OrganizationModal';
@@ -23,9 +23,9 @@ import { Container } from '@/components/Ui/Container';
 import { Box } from '@gluestack-ui/themed';
 
 export default function TabOneScreen() {
-  const router = useRouter();
-  const [profile, setProfile] = useState<Profile | null>(null);
   const { id } = useData();
+
+  const { data, isError, isPending, isPaused, refetch } = useProfile(id);
 
   const queryClient = useQueryClient();
 
@@ -58,11 +58,11 @@ export default function TabOneScreen() {
     getFn();
   }, [id]);
   useEffect(() => {
-    if (!profile) return;
-    if (!profile?.organizationId?.id && !profile?.workerId?.id) {
+    if (!data?.profile) return;
+    if (!data?.profile?.organizationId?.id && !data?.profile?.workerId?.id) {
       onOpen();
     }
-  }, [profile]);
+  }, [data?.profile]);
   const {
     data: connections,
     refetch: refetchConnections,
@@ -78,20 +78,18 @@ export default function TabOneScreen() {
     refetchConnections();
   };
 
-  if (isErrorConnections || isConnectionsPaused) {
+  if (isErrorConnections || isConnectionsPaused || isError || isPaused) {
     return <ErrorComponent refetch={handleRefetch} />;
   }
 
-  if (isPendingConnections) {
+  if (isPendingConnections || isPending) {
     return <LoadingComponent />;
   }
 
   const { connections: connectionsData } = connections;
-  if (!profile) {
-    return <LoadingComponent />;
-  }
 
-  const firstTen = connectionsData.slice(0, 10);
+  const firstTen = connectionsData?.slice(0, 10);
+  const { profile } = data;
 
   return (
     <Container>

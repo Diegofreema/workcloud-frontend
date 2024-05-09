@@ -120,6 +120,7 @@ export default function SignUpScreen() {
               text2: 'Please log in to continue',
             });
             resetForm();
+            setImageUrl('https://placehold.co/100x100');
             router.push('/');
           }
 
@@ -443,7 +444,7 @@ export default function SignUpScreen() {
                 }}
                 onPress={() => handleSubmit()}
               >
-                Create account
+                {isSubmitting ? 'Creating account...' : 'Create account'}
               </Button>
             </View>
           </VStack>

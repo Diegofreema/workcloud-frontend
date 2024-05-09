@@ -139,7 +139,11 @@ const Profile = (props: Props) => {
             pb={40}
             style={{ borderBottomColor: colors.gray, borderBottomWidth: 1 }}
           >
-            <SimpleLineIcons name="graduation" size={24} color="black" />
+            <SimpleLineIcons
+              name="graduation"
+              size={24}
+              color={darkMode === 'dark' ? 'white' : 'black'}
+            />
             <MyText poppins="Medium" fontSize={12}>
               {worker?.experience}
             </MyText>
@@ -159,7 +163,7 @@ const Profile = (props: Props) => {
             <MaterialCommunityIcons
               name="clipboard-list-outline"
               size={24}
-              color="black"
+              color={darkMode === 'dark' ? 'white' : 'black'}
             />
 
             <VStack gap={5} alignItems="flex-start">

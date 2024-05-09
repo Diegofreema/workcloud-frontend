@@ -20,7 +20,7 @@ import { InputComponent } from '../../../../components/InputComponent';
 import { colors } from '../../../../constants/Colors';
 import axios from 'axios';
 import { format } from 'date-fns';
-import { updateOrg } from '@/lib/helper';
+import { onDeleteImage, updateOrg } from '@/lib/helper';
 import { supabase } from '@/lib/supabase';
 import { Organization } from '@/constants/types';
 import { ErrorComponent } from '@/components/Ui/ErrorComponent';
@@ -36,6 +36,7 @@ const validationSchema = yup.object().shape({
   endTime: yup.string().required('Working time is required'),
   websiteUrl: yup.string().required('Website link is required'),
   email: yup.string().email('Invalid email').required('Email is required'),
+  image: yup.string().required('Logo is required'),
 });
 
 type Props = {};
@@ -45,10 +46,10 @@ const Edit = (props: Props) => {
   const [end, setEndTime] = useState(new Date(1598051730000));
   const [error, setError] = useState(false);
   const [organization, setOrganization] = useState();
-  const [image, setImage] = useState<string>('');
+
   const [isLoading, setIsLoading] = useState(true);
   const { editId } = useLocalSearchParams<{ editId: string; id: string }>();
-
+  const [path, setPath] = useState('');
   const [show, setShow] = useState(false);
   const [show2, setShow2] = useState(false);
   const [orgId, setOrgId] = useState('');
@@ -68,9 +69,41 @@ const Edit = (props: Props) => {
 
     // Save image if not cancelled
     if (!result.canceled) {
-      const base64 = `data:image/png;base64,${result.assets[0].base64}`;
+      const image = result.assets[0];
 
-      setImage(base64);
+      const arraybuffer = await fetch(image.uri).then((res) =>
+        res.arrayBuffer()
+      );
+
+      const fileExt = image.uri?.split('.').pop()?.toLowerCase() ?? 'jpeg';
+      const path = `${Date.now()}.${fileExt}`;
+      try {
+        const { data, error: uploadError } = await supabase.storage
+          .from('avatars/logo')
+          .upload(path, arraybuffer, {
+            contentType: image.mimeType ?? 'image/jpeg',
+          });
+
+        if (uploadError) {
+          throw uploadError.message;
+        }
+
+        if (!uploadError) {
+          setPath(data?.path);
+
+          setValues({
+            ...values,
+            // @ts-ignore
+            image: `https://mckkhgmxgjwjgxwssrfo.supabase.co/storage/v1/object/public/${data.fullPath}`,
+          });
+        }
+      } catch (error) {
+        Toast.show({
+          type: 'error',
+          text1: 'Something went wrong',
+          text2: 'Failed to upload image',
+        });
+      }
     }
   };
 
@@ -96,6 +129,7 @@ const Edit = (props: Props) => {
       websiteUrl: '',
       startTime: '',
       endTime: '',
+      image: '',
     },
     validationSchema,
     onSubmit: async (values) => {
@@ -164,10 +198,10 @@ const Edit = (props: Props) => {
           websiteUrl: data?.website,
           startTime: data?.workDays.split('-')[0],
           endTime: data?.workDays.split('-')[1],
+          image: data?.avatar,
         });
 
         setOrgId(data?.id);
-        setImage(data?.avatar);
       }
 
       if (error) {
@@ -202,6 +236,13 @@ const Edit = (props: Props) => {
   const showMode2 = () => {
     setShow2(true);
   };
+  // ! to fix later
+  const handleDeleteImage = () => {
+    setValues({ ...values, image: '' });
+
+    onDeleteImage(`logo/${path}`);
+    console.log('deleted');
+  };
   const {
     email,
     category,
@@ -213,6 +254,7 @@ const Edit = (props: Props) => {
     websiteUrl,
     startTime,
     endTime,
+    image,
   } = values;
 
   if (error) {
@@ -246,27 +288,40 @@ const Edit = (props: Props) => {
                 style={{ width: 100, height: 100, borderRadius: 50 }}
                 source={image}
               />
-              <TouchableOpacity
-                style={{
-                  position: 'absolute',
-                  bottom: 0,
-                  right: 3,
-                  backgroundColor: darkMode ? 'white' : 'black',
-                  padding: 5,
-                  borderRadius: 30,
-                  height: 30,
-                  width: 30,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-                onPress={onSelectImage}
-              >
-                <FontAwesome
-                  name="plus"
-                  size={20}
-                  color={darkMode ? 'black' : 'white'}
-                />
-              </TouchableOpacity>
+              {!values.image && (
+                <TouchableOpacity
+                  style={{
+                    position: 'absolute',
+                    bottom: 0,
+                    right: 3,
+                    backgroundColor: darkMode ? 'white' : 'black',
+                    padding: 5,
+                    borderRadius: 30,
+                  }}
+                  onPress={onSelectImage}
+                >
+                  <FontAwesome
+                    name="plus"
+                    size={20}
+                    color={darkMode ? 'black' : 'white'}
+                  />
+                </TouchableOpacity>
+              )}
+              {values.image && (
+                <TouchableOpacity
+                  style={{
+                    position: 'absolute',
+                    bottom: 0,
+                    right: 3,
+                    backgroundColor: darkMode ? 'white' : 'black',
+                    padding: 5,
+                    borderRadius: 30,
+                  }}
+                  onPress={handleDeleteImage}
+                >
+                  <FontAwesome name="trash" size={20} color={'red'} />
+                </TouchableOpacity>
+              )}
             </View>
           </View>
 

@@ -258,7 +258,7 @@ export default function SignInScreen() {
             }}
             onPress={() => handleSubmit()}
           >
-            Sign in
+            {isSubmitting ? 'Signing in...' : 'Sign in'}
           </Button>
 
           <Link href={'/signUp'} asChild style={{ alignItems: 'center' }}>

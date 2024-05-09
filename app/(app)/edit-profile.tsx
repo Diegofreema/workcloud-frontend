@@ -1,74 +1,33 @@
-import { View, Text } from 'react-native';
-import React, { useEffect, useState } from 'react';
-import { router, useLocalSearchParams, useRouter } from 'expo-router';
-import { defaultStyle } from '../../constants/index';
+import React from 'react';
+import { useLocalSearchParams } from 'expo-router';
 import { HeaderNav } from '../../components/HeaderNav';
 import { ProfileUpdateForm } from '../../components/Forms/ProfileUpdateForm';
 import { CompleteDialog } from '../../components/Dialogs/SavedDialog';
-import { useQueryClient } from '@tanstack/react-query';
-import axios from 'axios';
-import { Person, Profile } from '@/constants/types';
-import { supabase } from '@/lib/supabase';
-import Toast from 'react-native-toast-message';
-import { useData } from '@/hooks/useData';
 import { Container } from '../../components/Ui/Container';
+import { useProfile } from '@/lib/queries';
+import { ErrorComponent } from '@/components/Ui/ErrorComponent';
+import { LoadingComponent } from '@/components/Ui/LoadingComponent';
 
 const Update = () => {
-  const { userId } = useLocalSearchParams();
-  const { id } = useData();
-  const queryClient = useQueryClient();
-  const [person, setPerson] = useState<Profile | null>();
-  const router = useRouter();
-  useEffect(() => {
-    const getProfile = async () => {
-      try {
-        const { data, error } = await supabase
-          .from('user')
-          .select(
-            `name, avatar, streamToken, email, userId, organizationId (*), workerId (*)`
-          )
-          .eq('userId', id)
-          .single();
-        if (!error) {
-          // @ts-ignore
-          setPerson(data);
-        }
-        if (error) {
-          console.log(error);
+  const { userId } = useLocalSearchParams<{ userId: string }>();
 
-          router.back();
-        }
+  const { data, isError, isPending, isPaused, refetch } = useProfile(userId);
 
-        return data;
-      } catch (error) {
-        console.log(error);
-        Toast.show({
-          type: 'error',
-          text1: 'Error',
-          text2: 'Something went wrong',
-        });
-        router.back();
-      }
-    };
-    const getUser = async () => {
-      queryClient.fetchQuery({
-        queryKey: ['profile', userId],
-        queryFn: getProfile,
-      });
-    };
+  if (isError || isPaused) {
+    return <ErrorComponent refetch={refetch} />;
+  }
+  if (isPending) {
+    return <LoadingComponent />;
+  }
 
-    getUser();
-  }, []);
-
-  console.log(person);
-
+  const { profile } = data;
   return (
     <>
       <CompleteDialog text="Changes saved successfully" />
 
       <Container>
         <HeaderNav title="Edit Profile" />
-        <ProfileUpdateForm person={person} />
+        <ProfileUpdateForm person={profile} />
       </Container>
     </>
   );

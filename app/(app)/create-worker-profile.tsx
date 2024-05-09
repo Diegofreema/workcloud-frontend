@@ -9,7 +9,7 @@ import { useRouter } from 'expo-router';
 import { SelectList } from 'react-native-dropdown-select-list';
 
 import * as yup from 'yup';
-import { defaultStyle } from '../../constants';
+import { defaultStyle, fontFamily } from '../../constants';
 import { AuthHeader } from '../../components/AuthHeader';
 import { useDarkMode } from '../../hooks/useDarkMode';
 import Toast from 'react-native-toast-message';
@@ -266,6 +266,9 @@ const CreateProfile = (props: Props) => {
                   borderWidth: 0,
                   height: 50,
                 }}
+                dropdownTextStyles={{
+                  color: darkMode === 'dark' ? colors.white : colors.black,
+                }}
                 inputStyles={{ textAlign: 'left', borderWidth: 0 }}
                 fontFamily="PoppinsMedium"
                 setSelected={handleChange('gender')}
@@ -287,7 +290,10 @@ const CreateProfile = (props: Props) => {
               mode="contained"
               onPress={() => handleSubmit()}
               buttonColor={colors.buttonBlue}
+              style={{ borderRadius: 5 }}
               textColor="white"
+              contentStyle={{ height: 50, borderRadius: 2 }}
+              labelStyle={{ fontFamily: fontFamily.Medium, fontSize: 14 }}
             >
               {isSubmitting ? 'Submitting...' : 'Submit'}
             </Button>

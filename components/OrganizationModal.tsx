@@ -5,12 +5,14 @@ import { Feather } from '@expo/vector-icons';
 import { colors } from '../constants/Colors';
 import { useRouter } from 'expo-router';
 import { MyText } from './Ui/MyText';
+import { useDarkMode } from '@/hooks/useDarkMode';
 
 type Props = {};
 
 export const OrganizationModal = ({}: Props): JSX.Element => {
   const { isOpen, onClose } = useOrganizationModal();
   const router = useRouter();
+  const { darkMode } = useDarkMode();
 
   const createOrganization = () => {
     router.push('/create-workspace');
@@ -27,7 +29,14 @@ export const OrganizationModal = ({}: Props): JSX.Element => {
   };
   return (
     <Portal>
-      <Dialog visible={isOpen} onDismiss={onClose} style={styles.dialog}>
+      <Dialog
+        visible={isOpen}
+        onDismiss={onClose}
+        style={[
+          styles.dialog,
+          { backgroundColor: darkMode === 'dark' ? 'black' : 'white' },
+        ]}
+      >
         <View style={{ alignItems: 'center' }}>
           <MyText
             poppins="Bold"

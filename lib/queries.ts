@@ -4,7 +4,6 @@ import {
   ConnectionType,
   Org,
   Organization,
-  Person,
   PostType,
   Profile,
   Requests,
@@ -12,15 +11,11 @@ import {
   WaitList,
   Wks,
   WorkType,
-  WorkerProfile,
-  WorkerProfileArray,
   WorkerWithWorkspace,
   Workers,
-  Workspace,
   connections,
 } from '../constants/types';
 import { useAuth } from '@clerk/clerk-expo';
-import axios from 'axios';
 const api = process.env.EXPO_PUBLIC_BACKEND_API!;
 export const useFollowers = () => {
   const getFollowers = async () => {
@@ -425,7 +420,7 @@ export const useGetOrg = (id: string) => {
     };
   };
   return useQuery({
-    queryKey: ['single_orgs', id],
+    queryKey: ['get_single_orgs', id],
     queryFn: getOrg,
   });
 };

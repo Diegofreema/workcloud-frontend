@@ -3,7 +3,8 @@ import axios from 'axios';
 import Toast from 'react-native-toast-message';
 import { supabase } from './supabase';
 import { router } from 'expo-router';
-
+import { QueryClient } from '@tanstack/react-query';
+const queryClient = new QueryClient();
 export const createOrg = async (orgData: Org) => {
   try {
     const { data } = await axios.post(
@@ -86,4 +87,37 @@ export const onDeleteImage = async (path: string) => {
   } catch (error) {
     console.log(error);
   }
+};
+
+export const onRefresh = async (id: string) => {
+  queryClient.invalidateQueries({
+    queryKey: [
+      'wk',
+      id,
+      'waitList',
+      'pending_requests',
+      'myStaffs',
+      'connections',
+      'organization',
+      'assignedWk',
+      'profile',
+      'posts',
+      'wks',
+      'wk',
+      'personal',
+      'search',
+      'search_name',
+      'workers',
+      'personal_workers',
+      'other_workers',
+      'pending_worker',
+      'pending_requests',
+      'worker',
+      'request',
+      'single',
+      'single_orgs',
+      'get_single_orgs',
+    ],
+    refetchType: 'all',
+  });
 };

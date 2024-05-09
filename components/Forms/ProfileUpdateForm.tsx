@@ -30,11 +30,13 @@ import { router } from 'expo-router';
 import { supabase } from '@/lib/supabase';
 import { useData } from '@/hooks/useData';
 import { LoadingComponent } from '../Ui/LoadingComponent';
+import { onDeleteImage } from '@/lib/helper';
+import { useDarkMode } from '@/hooks/useDarkMode';
 const validationSchema = yup.object().shape({
   firstName: yup.string().required('First name is required'),
   lastName: yup.string().required('Last name is required'),
   email: yup.string().email('Invalid email'),
-  avatar: yup.string(),
+  avatar: yup.string().required('Profile image is required'),
   date_of_birth: yup.string(),
   phoneNumber: yup.string(),
 });
@@ -43,8 +45,6 @@ export const ProfileUpdateForm = ({
 }: {
   person: Profile | null | undefined;
 }): JSX.Element => {
-  console.log('🚀 ~ ProfileUpdateForm ~ person:', person);
-  const phoneInputRef = useRef<PhoneInput>(null);
   const { id } = useData();
   const queryClient = useQueryClient();
   const { onOpen } = useSaved();
@@ -116,7 +116,8 @@ export const ProfileUpdateForm = ({
 
   const [inputDate, setInputDate] = useState<Date | undefined>(undefined);
   console.log(values.avatar);
-
+  const [path, setPath] = useState('');
+  const { darkMode } = useDarkMode();
   const [date, setDate] = useState(new Date());
   const [dateOfBirth, setDateOfBirth] = useState(
     new Date().toISOString().split('T')[0]
@@ -142,11 +143,42 @@ export const ProfileUpdateForm = ({
       base64: true,
     });
 
+    // Save image if not cancelled
     if (!result.canceled) {
-      const base64 = `data:image/png;base64,${result.assets[0].base64}`;
-      setFieldValue('avatar', base64);
-    } else {
-      console.log('User cancelled image picker');
+      const image = result.assets[0];
+
+      const arraybuffer = await fetch(image.uri).then((res) =>
+        res.arrayBuffer()
+      );
+
+      const fileExt = image.uri?.split('.').pop()?.toLowerCase() ?? 'jpeg';
+      const path = `${Date.now()}.${fileExt}`;
+      try {
+        const { data, error: uploadError } = await supabase.storage
+          .from('avatars/profile')
+          .upload(path, arraybuffer, {
+            contentType: image.mimeType ?? 'image/jpeg',
+          });
+
+        if (uploadError) {
+          throw uploadError.message;
+        }
+
+        if (!uploadError) {
+          setPath(data?.path);
+          setFieldValue(
+            'avatar',
+            // @ts-ignore
+            `https://mckkhgmxgjwjgxwssrfo.supabase.co/storage/v1/object/public/${data?.fullPath}`
+          );
+        }
+      } catch (error) {
+        Toast.show({
+          type: 'error',
+          text1: 'Something went wrong',
+          text2: 'Failed to upload image',
+        });
+      }
     }
   };
 
@@ -178,6 +210,11 @@ export const ProfileUpdateForm = ({
     setFieldValue('date_of_birth', dateOfBirth);
     onHideDatePicker();
   };
+  const handleDeleteImage = () => {
+    setFieldValue('avatar', '');
+
+    onDeleteImage(`logo/${path}`);
+  };
 
   if (!person) return <LoadingComponent />;
 
@@ -199,23 +236,40 @@ export const ProfileUpdateForm = ({
             style={{ width: 100, height: 100, borderRadius: 50 }}
             source={{ uri: values.avatar }}
           />
-          <TouchableOpacity
-            style={{
-              position: 'absolute',
-              bottom: 0,
-              right: 3,
-              backgroundColor: 'black',
-              padding: 5,
-              borderRadius: 30,
-              width: 30,
-              height: 30,
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}
-            onPress={pickImageAsync}
-          >
-            <FontAwesome name="plus" size={20} color={'white'} />
-          </TouchableOpacity>
+          {!values.avatar && (
+            <TouchableOpacity
+              style={{
+                position: 'absolute',
+                bottom: 0,
+                right: 3,
+                backgroundColor: darkMode ? 'white' : 'black',
+                padding: 5,
+                borderRadius: 30,
+              }}
+              onPress={pickImageAsync}
+            >
+              <FontAwesome
+                name="plus"
+                size={20}
+                color={darkMode ? 'black' : 'white'}
+              />
+            </TouchableOpacity>
+          )}
+          {values.avatar && (
+            <TouchableOpacity
+              style={{
+                position: 'absolute',
+                bottom: 0,
+                right: 3,
+                backgroundColor: darkMode ? 'white' : 'black',
+                padding: 5,
+                borderRadius: 30,
+              }}
+              onPress={handleDeleteImage}
+            >
+              <FontAwesome name="trash" size={20} color={'red'} />
+            </TouchableOpacity>
+          )}
         </View>
       </View>
       <View style={{ marginTop: 50 }}>
@@ -358,8 +412,8 @@ export const ProfileUpdateForm = ({
         </VStack>
 
         <View style={{ marginTop: 50 }}>
-          <MyButton loading={isSubmitting} onPress={() => handleSubmit()}>
-            Save Changes{' '}
+          <MyButton disabled={isSubmitting} onPress={() => handleSubmit()}>
+            {isSubmitting ? 'Saving...' : 'Save Changes'}
           </MyButton>
         </View>
       </View>

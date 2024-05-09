@@ -10,6 +10,9 @@ import { useChatClient } from '@/useChatClient';
 import { AppProvider } from '@/AppContext';
 import { useDarkMode } from '@/hooks/useDarkMode';
 import { StatusBar } from '@gluestack-ui/themed';
+import { supabase } from '@/lib/supabase';
+import { useQueryClient } from '@tanstack/react-query';
+import { onRefresh } from '@/lib/helper';
 
 const api = 'cnvc46pm8uq9';
 const client = StreamChat.getInstance('cnvc46pm8uq9');
@@ -18,20 +21,30 @@ export default function AppLayout() {
   const { clientIsReady } = useChatClient();
   const { id, getValues, user } = useData();
   const { darkMode } = useDarkMode();
+  const queryClient = useQueryClient();
 
-  console.log('🚀 ~ AppLayout ~ user:', user?.streamToken);
-  // const [clientVideo] = useState(() => {
-  //   const userData = {
-  //     id: user?.id as string,
-  //     name: user?.name as string,
-  //   };
-  //   const tokenProvider = () => Promise.resolve(user?.streamToken as string);
-  //   return new StreamVideoClient({
-  //     chatApiKey,
-  //     tokenProvider,
-  //     userData,
-  //   });
-  // });
+  useEffect(() => {
+    const channel = supabase
+      .channel('workcloud')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+        },
+        (payload) => {
+          if (payload) {
+            onRefresh(id);
+          }
+          console.log('Change received!', payload);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
   const chatTheme: DeepPartial<Theme> = {
     channel: {
       selectChannel: {
