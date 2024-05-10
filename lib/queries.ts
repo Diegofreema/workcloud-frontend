@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from './supabase';
 import {
   ConnectionType,
+  Followers,
   Org,
   Organization,
   PostType,
@@ -49,6 +50,39 @@ export const usePersonalOrgs = (id: any) => {
   return useQuery({
     queryKey: ['organization'],
     queryFn: async () => getOrgs(),
+  });
+};
+export const useGetFollowers = (id: any) => {
+  const getFollowers = async () => {
+    const { data, error } = await supabase
+      .from('followers')
+      .select('*')
+      .eq('organizationId', id);
+    return {
+      followers: data as Followers[],
+      error,
+    };
+  };
+  return useQuery({
+    queryKey: ['followers', id],
+    queryFn: async () => getFollowers(),
+  });
+};
+export const useOrg = (id: any) => {
+  const getOrg = async () => {
+    const { data, error } = await supabase
+      .from('organization')
+      .select('*')
+      .eq('id', id)
+      .single();
+    return {
+      organization: data as Organization,
+      error,
+    };
+  };
+  return useQuery({
+    queryKey: ['use_organization'],
+    queryFn: async () => getOrg(),
   });
 };
 

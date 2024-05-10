@@ -216,7 +216,11 @@ export type Person = {
     phoneNumber: string;
   };
 };
-
+export type Followers = {
+  id: string;
+  organizationId: string;
+  followerId: string;
+};
 export type ConnectionType = {
   id: number;
   owner: string;

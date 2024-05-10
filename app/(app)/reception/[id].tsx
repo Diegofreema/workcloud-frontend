@@ -12,7 +12,7 @@ import {
   Dimensions,
 } from 'react-native';
 import React, { useEffect, useRef, useState } from 'react';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { router, useLocalSearchParams, useRouter } from 'expo-router';
 import { useGetOrg, useGetPosts, useOrgsWorkers } from '@/lib/queries';
 import { ErrorComponent } from '@/components/Ui/ErrorComponent';
 import { LoadingComponent } from '@/components/Ui/LoadingComponent';
@@ -31,6 +31,9 @@ import { useQueryClient } from '@tanstack/react-query';
 import { PostComponent } from '@/components/PostComponent';
 import Carousel from 'react-native-reanimated-carousel';
 import { useDarkMode } from '@/hooks/useDarkMode';
+import { MyButton } from '@/components/Ui/MyButton';
+import { useChatContext } from 'stream-chat-expo';
+import { FontAwesome6 } from '@expo/vector-icons';
 type Props = {};
 
 const Reception = (props: Props) => {
@@ -117,7 +120,6 @@ const Reception = (props: Props) => {
 
   const { org } = data;
   const { workers: staffs } = workers;
-  console.log(staffs[0].role, staffs[1].role, 'staffs');
 
   return (
     <ScrollView
@@ -125,7 +127,11 @@ const Reception = (props: Props) => {
       contentContainerStyle={{ paddingBottom: 20, flexGrow: 1 }}
       style={{ flex: 1, marginHorizontal: 20 }}
     >
-      <HeaderNav title={org?.name} subTitle={org?.category} />
+      <HeaderNav
+        title={org?.name}
+        subTitle={org?.category}
+        RightComponent={ReceptionRightHeader}
+      />
       <HStack gap={10} alignItems="center" my={10}>
         <Avatar.Image source={{ uri: org?.avatar }} size={50} />
         <VStack>
@@ -211,7 +217,6 @@ const styles = StyleSheet.create({
 
 const Representatives = ({ data }: { data: WorkerWithWorkspace[] }) => {
   const { darkMode } = useDarkMode();
-  console.log(data.length, 'data');
 
   return (
     <FlatList
@@ -240,6 +245,7 @@ const Representatives = ({ data }: { data: WorkerWithWorkspace[] }) => {
 const RepresentativeItem = ({ item }: { item: WorkerWithWorkspace }) => {
   const router = useRouter();
   const { id } = useData();
+  const { client } = useChatContext();
   const handlePress = async () => {
     const { data, error: err } = await supabase
       .from('waitList')
@@ -302,6 +308,17 @@ const RepresentativeItem = ({ item }: { item: WorkerWithWorkspace }) => {
       }
     }
   };
+
+  const onPress = async () => {
+    const channel = client.channel('messaging', {
+      members: [id, item?.userId?.userId],
+    });
+
+    await channel.watch();
+
+    router.push(`/chat/${channel.id}`);
+  };
+
   return (
     <Pressable
       style={({ pressed }) => [{ opacity: pressed ? 0.5 : 1, flex: 1 }]}
@@ -332,24 +349,56 @@ const RepresentativeItem = ({ item }: { item: WorkerWithWorkspace }) => {
           </View>
         )}
         {item?.workspaceId && !item?.workspaceId?.active && (
-          <View
-            style={{
-              backgroundColor: colors.closeTextColor,
-              borderRadius: 20,
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: 3,
-            }}
-          >
-            <MyText
-              poppins="Bold"
-              style={{ color: colors.closeBackgroundColor }}
+          <>
+            <View
+              style={{
+                backgroundColor: colors.closeBackgroundColor,
+                borderRadius: 20,
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: 3,
+              }}
             >
-              Inactive
-            </MyText>
-          </View>
+              <MyText poppins="Bold" style={{ color: colors.closeTextColor }}>
+                Inactive
+              </MyText>
+            </View>
+
+            {item?.userId?.userId !== id && (
+              <Pressable
+                onPress={onPress}
+                style={{
+                  backgroundColor: '#C0D1FE',
+                  padding: 7,
+                  marginTop: 5,
+                  borderRadius: 5,
+                }}
+              >
+                <MyText poppins="Medium" style={{ color: colors.dialPad }}>
+                  Message
+                </MyText>
+              </Pressable>
+            )}
+          </>
         )}
       </VStack>
+    </Pressable>
+  );
+};
+
+const ReceptionRightHeader = () => {
+  const { darkMode } = useDarkMode();
+  const { id } = useLocalSearchParams<{ id: string }>();
+  return (
+    <Pressable
+      style={({ pressed }) => ({ padding: 5, opacity: pressed ? 0.5 : 1 })}
+      onPress={() => router.push(`/overview/${id}`)}
+    >
+      <FontAwesome6
+        name="building-columns"
+        size={24}
+        color={darkMode === 'dark' ? colors.white : colors.black}
+      />
     </Pressable>
   );
 };

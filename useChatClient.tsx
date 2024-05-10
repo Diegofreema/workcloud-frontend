@@ -14,7 +14,6 @@ export const useChatClient = () => {
     name: user?.name,
     image: user?.avatarUrl,
   };
-  console.log('🚀 ~ useChatClient ~ userData:', user);
 
   const [clientIsReady, setClientIsReady] = useState(false);
   useEffect(() => {
