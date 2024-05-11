@@ -87,6 +87,7 @@ export const SelectRow = ({
           organizationId: organizationId,
           workerId: profile?.workerId?.userId,
           personal: true,
+          locked: false,
         })
         .select()
         .single();

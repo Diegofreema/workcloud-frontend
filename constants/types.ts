@@ -199,6 +199,8 @@ export type WK = {
   leisure: boolean;
   locked: boolean;
   signedIn: boolean;
+  personal: boolean;
+  ownerId: Profile;
 };
 export type Person = {
   user: {

@@ -90,12 +90,10 @@ export const useOtherOrgs = (id: any) => {
   const getOrgs = async () => {
     const { data, error } = await supabase
       .from('workspace')
-      .select('*, organizationId(*)')
-      .eq('workerId', id)
-      .single();
-
+      .select('*, organizationId(*) , ownerId(*)')
+      .eq('workerId', id);
     return {
-      workspace: data as WK,
+      workspace: data as WK[],
       error,
     };
   };
@@ -124,6 +122,7 @@ export const useProfile = (id: any) => {
   return useQuery({
     queryKey: ['profile', id],
     queryFn: async () => getProfile(),
+    refetchOnWindowFocus: true,
   });
 };
 

@@ -23,6 +23,9 @@ import { useHandleStaff } from '@/hooks/useHandleStaffs';
 import { RemoveUser } from '@/components/Dialogs/RemoveUser';
 import { Container } from '@/components/Ui/Container';
 import { useDarkMode } from '@/hooks/useDarkMode';
+import { supabase } from '@/lib/supabase';
+import { useQueryClient } from '@tanstack/react-query';
+import { useData } from '@/hooks/useData';
 
 type Props = {};
 const allRoles = [
@@ -35,8 +38,10 @@ const allRoles = [
 ];
 const Staffs = (props: Props) => {
   const { id } = useLocalSearchParams<{ id: string }>();
+  const { id: userId } = useData();
   const [selectId, setSelectId] = useState('');
   const [isVisible, setIsVisible] = useState(false);
+  const queryClient = useQueryClient();
   const { onOpen: onOpenSelectRowModal, onClose: onCloseSelectRow } =
     useSelectNewRow();
   const { getItem, item: staff } = useHandleStaff();
@@ -62,7 +67,30 @@ const Staffs = (props: Props) => {
 
     return data?.staffs?.filter((worker) => worker.role === role);
   }, [data, role]);
+  useEffect(() => {
+    const channel = supabase
+      .channel('workcloud')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'workspace',
+        },
+        (payload) => {
+          if (payload) {
+            queryClient.invalidateQueries({ queryKey: ['myStaffs', userId] });
+            queryClient.invalidateQueries({ queryKey: ['assignedWk'] });
+          }
+          console.log('Change received!', payload);
+        }
+      )
+      .subscribe();
 
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
   if (isError || isRefetchError || isPaused) {
     return <ErrorComponent refetch={refetch} />;
   }
@@ -80,7 +108,7 @@ const Staffs = (props: Props) => {
     getItem(item);
   };
   const { staffs } = data;
-  console.log('🚀 ~ Staffs ~ wks:', staffs[0]);
+
   const array: { icon: any; text: string }[] = [
     {
       icon: 'user-o',

@@ -1,6 +1,6 @@
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { Tabs } from 'expo-router';
-import { useColorScheme } from 'react-native';
+import { View, useColorScheme } from 'react-native';
 
 import { colors } from '../../../constants/Colors';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -9,6 +9,8 @@ import { fontFamily } from '../../../constants';
 
 import { useDarkMode } from '@/hooks/useDarkMode';
 import { StatusBar } from '@gluestack-ui/themed';
+import { useUnread } from '@/hooks/useUnread';
+import { Badge } from '@rneui/themed';
 
 /**
  * You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
@@ -28,6 +30,8 @@ export const unstable_settings = {
 export default function TabLayout() {
   const colorScheme = useColorScheme();
   const { darkMode } = useDarkMode();
+  const { unread } = useUnread();
+
   return (
     <>
       <StatusBar
@@ -79,11 +83,24 @@ export default function TabLayout() {
           options={{
             title: 'Messages',
             tabBarIcon: ({ focused, size }) => (
-              <TabBarIcon
-                name="envelope"
-                color={focused ? colors.buttonBlue : colors.gray}
-                size={size}
-              />
+              <View>
+                <TabBarIcon
+                  name="envelope"
+                  color={focused ? colors.buttonBlue : colors.gray}
+                  size={size}
+                />
+                {unread > 0 && (
+                  <Badge
+                    containerStyle={{
+                      position: 'absolute',
+                      top: -5,
+                      right: -5,
+                    }}
+                    value={`${unread}`}
+                    status="success"
+                  />
+                )}
+              </View>
             ),
             tabBarLabel: ({ focused }) => (
               <Text

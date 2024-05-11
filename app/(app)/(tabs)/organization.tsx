@@ -1,4 +1,4 @@
-import { StyleSheet, View, Pressable } from 'react-native';
+import { StyleSheet, View, Pressable, FlatList } from 'react-native';
 import React from 'react';
 import { useDarkMode } from '../../../hooks/useDarkMode';
 import { WorkCloudHeader } from '../../../components/WorkCloudHeader';
@@ -52,17 +52,6 @@ const workspace = (props: Props) => {
   const { organizations } = data;
   const organization = organizations[0];
 
-  const handlePress = () => {
-    if (otherOrgs?.workspace?.locked) {
-      Toast.show({
-        type: 'info',
-        text1: 'This workspace is locked',
-        text2: 'Please wait till the admin unlocks it',
-      });
-      return;
-    }
-    router.replace(`/wk/${otherOrgs?.workspace?.id}`);
-  };
   return (
     <Container>
       <View style={[{ flexDirection: 'row', justifyContent: 'space-between' }]}>
@@ -104,11 +93,20 @@ const workspace = (props: Props) => {
         >
           Assigned workspace
         </MyText>
-        {otherOrgs?.workspace ? (
-          <Workspace onPress={handlePress} item={otherOrgs?.workspace} />
-        ) : (
-          <EmptyText text="No assigned workspace yet" />
-        )}
+
+        <FlatList
+          data={otherOrgs?.workspace}
+          renderItem={({ item }) => <Workspace item={item} />}
+          keyExtractor={(item) => item.id.toString()}
+          ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
+          onRefresh={handleRefetch}
+          refreshing={isRefetching}
+          showsVerticalScrollIndicator={false}
+          ListEmptyComponent={() => (
+            <EmptyText text="No assigned workspace yet" />
+          )}
+          contentContainerStyle={{ paddingBottom: 50 }}
+        />
       </View>
     </Container>
   );
@@ -118,10 +116,26 @@ export default workspace;
 
 const styles = StyleSheet.create({});
 
-const Workspace = ({ item, onPress }: { item: WK; onPress: () => void }) => {
+const Workspace = ({ item }: { item: WK }) => {
+  const handlePress = () => {
+    if (item?.locked) {
+      Toast.show({
+        type: 'info',
+        text1: 'This workspace is locked',
+        text2: 'Please wait till the admin unlocks it',
+      });
+      return;
+    }
+    router.replace(`/wk/${item?.id}`);
+  };
+
+  const imgUrl = item?.personal
+    ? item?.ownerId?.avatar
+    : item?.organizationId?.avatar;
+
   return (
     <Pressable
-      onPress={onPress}
+      onPress={handlePress}
       style={{
         width: '100%',
         flexDirection: 'row',
@@ -129,10 +143,7 @@ const Workspace = ({ item, onPress }: { item: WK; onPress: () => void }) => {
       }}
     >
       <HStack gap={10} alignItems="center">
-        <Avatar.Image
-          source={{ uri: item?.organizationId?.avatar }}
-          size={50}
-        />
+        <Avatar.Image source={{ uri: imgUrl }} size={50} />
         <VStack>
           <MyText poppins="Bold" style={{ fontSize: 13 }}>
             {item?.role}

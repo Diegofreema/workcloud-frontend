@@ -23,7 +23,8 @@ import { Container } from '@/components/Ui/Container';
 import { Box } from '@gluestack-ui/themed';
 
 export default function TabOneScreen() {
-  const { id } = useData();
+  const { id, user } = useData();
+  console.log({ user });
 
   const { data, isError, isPending, isPaused, refetch } = useProfile(id);
 

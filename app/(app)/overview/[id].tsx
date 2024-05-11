@@ -1,4 +1,11 @@
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import {
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+  useWindowDimensions,
+} from 'react-native';
 import React, { useEffect, useMemo, useState } from 'react';
 
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -96,7 +103,7 @@ const Overview = (props: Props) => {
   const { darkMode } = useDarkMode();
   const [loading, setLoading] = useState(false);
   const queryClient = useQueryClient();
-
+  const { width } = useWindowDimensions();
   const { data, isPending, error, refetch, isPaused } = useOrg(id);
   const {
     data: followersData,
@@ -181,8 +188,8 @@ const Overview = (props: Props) => {
 
   const startDay = organization?.workDays?.split('-')[0];
   const endDay = organization?.workDays?.split('-')[1];
-  const unfollowingText = loading ? 'Unfollowing...' : 'Unfollow';
-  const followingText = loading ? 'Following...' : 'Follow';
+  const unfollowingText = loading ? 'UnJoining...' : 'UnJoin';
+  const followingText = loading ? 'Joining...' : 'Join';
   return (
     <Container>
       <HeaderNav title={organization?.name} subTitle={organization?.category} />
@@ -205,7 +212,7 @@ const Overview = (props: Props) => {
               <Text
                 style={{
                   fontFamily: 'PoppinsBold',
-
+                  maxWidth: width * 0.7,
                   fontSize: 12,
                   color: darkMode === 'dark' ? colors.white : colors.black,
                 }}

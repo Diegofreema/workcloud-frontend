@@ -1,5 +1,5 @@
 import { FlatList, StyleSheet, Text, View } from 'react-native';
-import React, { ComponentType } from 'react';
+import React, { ComponentType, useEffect } from 'react';
 import { useDarkMode } from '../../../hooks/useDarkMode';
 import { useRouter } from 'expo-router';
 import { TextComponents } from '../../../components/TextComponents';
@@ -19,6 +19,7 @@ import { HStack } from '@gluestack-ui/themed';
 import { Image } from 'expo-image';
 import { colors } from '@/constants/Colors';
 import { useData } from '@/hooks/useData';
+import { useUnread } from '@/hooks/useUnread';
 
 type Props = {};
 
@@ -98,7 +99,11 @@ const ErrorComponent = () => {
 
 const Preview = (props: ChannelPreviewMessengerProps) => {
   const { unread, PreviewAvatar, latestMessagePreview } = props;
+  const { getUnread } = useUnread();
   const { darkMode } = useDarkMode();
+  useEffect(() => {
+    getUnread(unread || 0);
+  }, [unread]);
 
   const backgroundColor = unread ? colors.dialPad : 'transparent';
   return (

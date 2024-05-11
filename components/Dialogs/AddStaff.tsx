@@ -127,7 +127,6 @@ export const Menu = ({ isVisible, setIsVisible, array }: Props) => {
   };
 
   const onUnlockWorkspace = async () => {
-    alert('Pressed');
     const { error } = await supabase
       .from('workspace')
       .update({ locked: !item?.workspaceId?.locked })

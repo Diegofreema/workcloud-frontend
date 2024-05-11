@@ -101,27 +101,6 @@ const Work = (props: Props) => {
     };
   }, []);
 
-  // useEffect(() => {
-  //   if (userId === wks?.workerId?.userId) return;
-  //   const backAction = () => {
-  //     Alert.alert('Hold on!', 'Are you sure you want to leave?', [
-  //       {
-  //         text: 'Cancel',
-  //         onPress: () => null,
-  //         style: 'cancel',
-  //       },
-  //       { text: 'YES', onPress: () => exitWaitList(wks?.id, userId) },
-  //     ]);
-  //     return false;
-  //   };
-
-  //   const backHandler = BackHandler.addEventListener(
-  //     'hardwareBackPress',
-  //     backAction
-  //   );
-
-  //   return () => backHandler.remove();
-  // }, []);
   const handleRefetch = () => {
     refetch();
     refetchWaitList();

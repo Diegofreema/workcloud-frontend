@@ -59,9 +59,9 @@ const Reception = (props: Props) => {
     isPaused: isPausedWorkers,
   } = useOrgsWorkers(data?.org?.id);
   const { width } = useWindowDimensions();
-  useEffect(() => {
-    if (data?.org?.ownerId === userId) return;
+  console.log(data?.org?.ownerId, userId, 'data?.org?.ownerId === userId');
 
+  useEffect(() => {
     const createConnection = async () => {
       const { data, error: err } = await supabase
         .from('connections')
@@ -95,7 +95,7 @@ const Reception = (props: Props) => {
         });
       }
     };
-    createConnection();
+    if (data?.org?.ownerId !== userId) createConnection();
   }, [id, userId]);
 
   const handleRefetch = () => {
@@ -195,6 +195,15 @@ const Reception = (props: Props) => {
           )}
         />
       )}
+      <MyText
+        poppins="Bold"
+        style={{
+          fontSize: 12,
+          marginVertical: 20,
+        }}
+      >
+        Representatives
+      </MyText>
       <Representatives data={staffs} />
     </ScrollView>
   );
@@ -216,28 +225,17 @@ const styles = StyleSheet.create({
 });
 
 const Representatives = ({ data }: { data: WorkerWithWorkspace[] }) => {
-  const { darkMode } = useDarkMode();
-
   return (
     <FlatList
-      ListHeaderComponent={() => (
-        <Text
-          style={{
-            color: darkMode === 'dark' ? 'white' : 'black',
-            fontSize: 12,
-            fontFamily: 'PoppinsBold',
-            marginVertical: 20,
-          }}
-        >
-          Representatives
-        </Text>
-      )}
       scrollEnabled={false}
       data={data}
-      contentContainerStyle={{ paddingBottom: 30 }}
+      contentContainerStyle={{
+        paddingBottom: 30,
+        flexDirection: 'row',
+        gap: 15,
+      }}
       renderItem={({ item }) => <RepresentativeItem item={item} />}
       ListEmptyComponent={() => <EmptyText text="No representatives yet" />}
-      numColumns={3}
     />
   );
 };
@@ -321,7 +319,12 @@ const RepresentativeItem = ({ item }: { item: WorkerWithWorkspace }) => {
 
   return (
     <Pressable
-      style={({ pressed }) => [{ opacity: pressed ? 0.5 : 1, flex: 1 }]}
+      style={({ pressed }) => [
+        {
+          opacity: pressed ? 0.5 : 1,
+          marginBottom: 10,
+        },
+      ]}
       onPress={handlePress}
     >
       <VStack alignItems="center" justifyContent="center" gap={2}>

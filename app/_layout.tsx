@@ -5,7 +5,7 @@ import {
   ThemeProvider,
 } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
-import { Slot } from 'expo-router';
+import { Slot, usePathname } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import * as Updates from 'expo-updates';
@@ -120,7 +120,8 @@ export default function RootLayout() {
 
 function RootLayoutNav() {
   const { darkMode } = useDarkMode();
-
+  const pathname = usePathname();
+  console.log('🚀 ~ RootLayoutNav ~ pathname:', pathname);
   return (
     <ThemeProvider value={darkMode === 'dark' ? DarkTheme : DefaultTheme}>
       <StatusBar
