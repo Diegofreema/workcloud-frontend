@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { StyleSheet, Pressable, View, FlatList } from 'react-native';
 
 import Modal from 'react-native-modal';
@@ -10,9 +10,6 @@ import { Divider } from 'react-native-paper';
 import { useRouter } from 'expo-router';
 import { supabase } from '../../lib/supabase';
 import Toast from 'react-native-toast-message';
-import { useAuth } from '@clerk/clerk-expo';
-import { usePersonalOrgs } from '../../lib/queries';
-import { LoadingComponent } from '../Ui/LoadingComponent';
 import { useQueryClient } from '@tanstack/react-query';
 import { FontAwesome } from '@expo/vector-icons';
 import { useAddStaff } from '@/hooks/useAddStaff';

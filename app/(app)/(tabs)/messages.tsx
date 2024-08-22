@@ -13,7 +13,7 @@ import {
   EmptyStateProps,
 } from 'stream-chat-expo';
 import { MyText } from '@/components/Ui/MyText';
-import { useAuth } from '@clerk/clerk-expo';
+
 import { LoadingComponent } from '@/components/Ui/LoadingComponent';
 import { HStack } from '@gluestack-ui/themed';
 import { Image } from 'expo-image';

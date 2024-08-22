@@ -2,12 +2,9 @@ import { StyleSheet, ScrollView, Pressable, View } from 'react-native';
 import { HStack, VStack } from '@gluestack-ui/themed';
 import { Image } from 'expo-image';
 
-import { HeadingText } from '../Ui/HeadingText';
 import { router, useLocalSearchParams } from 'expo-router';
 import { MyText } from '../Ui/MyText';
 import { colors } from '../../constants/Colors';
-import { VideoPreview } from '../Ui/VideoPreview';
-import { useAuth, useSignIn } from '@clerk/clerk-expo';
 import { useData } from '@/hooks/useData';
 import { FontAwesome } from '@expo/vector-icons';
 import { chatApiKey } from '@/chatConfig';

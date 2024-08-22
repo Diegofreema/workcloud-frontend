@@ -1,10 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from './supabase';
-import { Organization, Profile } from '../constants/types';
-import { StreamChat } from 'stream-chat';
+import { Profile } from '../constants/types';
 import Toast from 'react-native-toast-message';
-import { useUser } from '@clerk/clerk-expo';
-import axios, { AxiosError } from 'axios';
+import axios from 'axios';
 import { useRouter } from 'expo-router';
 
 const API = process.env.EXPO_PUBLIC_API!;
@@ -13,13 +10,13 @@ export const useCreateProfile = () => {
   const queryClient = useQueryClient();
   const router = useRouter();
   return useMutation({
-    mutationFn: async ({ email, user_id, name, avatarUrl }: Profile) => {
+    mutationFn: async ({}: Profile) => {
       try {
         const { data } = await axios.post('http://localhost:3000/', {
-          email: email,
-          user_id: user_id,
+          email: '',
+          user_id: 'user_id',
           name: name,
-          avatarUrl: avatarUrl,
+          avatarUrl: '',
         });
         return data;
       } catch (error) {

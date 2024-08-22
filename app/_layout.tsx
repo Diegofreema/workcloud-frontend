@@ -18,27 +18,9 @@ import { config } from '@gluestack-ui/config';
 import { useDarkMode } from '@/hooks/useDarkMode';
 
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ClerkProvider } from '@clerk/clerk-expo';
 
 import { PermissionsAndroid, Platform } from 'react-native';
 
-const ClerkKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!;
-const tokenCache = {
-  async getToken(key: string) {
-    try {
-      return SecureStore.getItemAsync(key);
-    } catch (err) {
-      return null;
-    }
-  },
-  async saveToken(key: string, value: string) {
-    try {
-      return SecureStore.setItemAsync(key, value);
-    } catch (err) {
-      return;
-    }
-  },
-};
 export {
   // Catch any errors thrown by the Layout component.
   ErrorBoundary,
@@ -105,16 +87,14 @@ export default function RootLayout() {
   }
 
   return (
-    <ClerkProvider publishableKey={ClerkKey} tokenCache={tokenCache}>
-      <GluestackUIProvider config={config}>
-        <QueryClientProvider client={queryClient}>
-          <PaperProvider>
-            <RootLayoutNav />
-            <Toast />
-          </PaperProvider>
-        </QueryClientProvider>
-      </GluestackUIProvider>
-    </ClerkProvider>
+    <GluestackUIProvider config={config}>
+      <QueryClientProvider client={queryClient}>
+        <PaperProvider>
+          <RootLayoutNav />
+          <Toast />
+        </PaperProvider>
+      </QueryClientProvider>
+    </GluestackUIProvider>
   );
 }
 

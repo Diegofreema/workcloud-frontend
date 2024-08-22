@@ -12,7 +12,9 @@
       "resizeMode": "cover",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true
     },
@@ -35,7 +37,6 @@
           "origin": "http://localhost:8081/"
         }
       ],
-
       [
         "expo-updates",
         {
@@ -47,7 +48,6 @@
       [
         "@config-plugins/react-native-webrtc",
         {
-          // optionally you can add your own explanations for permissions on iOS
           "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera",
           "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone"
         }
@@ -61,7 +61,8 @@
             ]
           }
         }
-      ]
+      ],
+      "expo-font"
     ],
     "experiments": {
       "typedRoutes": true

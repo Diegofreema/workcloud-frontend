@@ -5,7 +5,7 @@ import { defaultStyle } from '../../../constants/index';
 import { TopCard } from '../../../components/LoggedInuser/TopCard';
 import { BottomCard } from '../../../components/LoggedInuser/BottomCard';
 import { MiddleCard } from '../../../components/LoggedInuser/MiddleCard';
-import { useAuth, useUser } from '@clerk/clerk-expo';
+
 import { LoadingComponent } from '@/components/Ui/LoadingComponent';
 import { Redirect, useLocalSearchParams } from 'expo-router';
 import { useGetConnection, useProfile } from '@/lib/queries';

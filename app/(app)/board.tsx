@@ -7,7 +7,7 @@ import { InputComponent } from '../../components/InputComponent';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useFormik } from 'formik';
 import { useRouter } from 'expo-router';
-import RNPickerSelect from 'react-native-picker-select';
+// import RNPickerSelect from 'react-native-picker-select';
 import { supabase } from '../../lib/supabase';
 import * as yup from 'yup';
 import dateFormat from 'dateformat';
@@ -15,7 +15,7 @@ import { defaultStyle } from '../../constants';
 import { AuthHeader } from '../../components/AuthHeader';
 import { useDarkMode } from '../../hooks/useDarkMode';
 import Toast from 'react-native-toast-message';
-import { useUser } from '@clerk/clerk-expo';
+
 type Props = {};
 const validationSchema = yup.object().shape({
   firstName: yup.string().required('First name is required'),
@@ -26,7 +26,7 @@ const validationSchema = yup.object().shape({
 });
 const signup = (props: Props) => {
   const { darkMode } = useDarkMode();
-  const { isLoaded, isSignedIn, user } = useUser();
+
   const [date, setDate] = useState(new Date());
   const [error, setError] = useState(false);
 
@@ -34,16 +34,16 @@ const signup = (props: Props) => {
 
   const [show, setShow] = useState(false);
   const router = useRouter();
-  useEffect(() => {
-    if (isLoaded && !isSignedIn) {
-      Toast.show({
-        type: 'error',
-        text1: 'Unauthorized',
-        text2: 'Please login to continue',
-      });
-      router.replace('/login');
-    }
-  }, []);
+  // useEffect(() => {
+  //   if (isLoaded && !isSignedIn) {
+  //     Toast.show({
+  //       type: 'error',
+  //       text1: 'Unauthorized',
+  //       text2: 'Please login to continue',
+  //     });
+  //     router.replace('/login');
+  //   }
+  // }, []);
 
   const onChange = (event: any, selectedDate: any) => {
     const currentDate = selectedDate;
@@ -85,8 +85,8 @@ const signup = (props: Props) => {
     initialValues: {
       email: '',
       password: '',
-      firstName: user?.firstName || '',
-      lastName: user?.lastName || '',
+      firstName: '',
+      lastName: '',
 
       gender: '',
     },
@@ -104,10 +104,10 @@ const signup = (props: Props) => {
       const { error } = await supabase.from('profile').insert({
         email,
         name: `${firstName} ${lastName}`,
-        user_id: user?.id,
+        user_id: '',
         gender,
         boarded: true,
-        avatarUrl: user?.imageUrl || '',
+        avatarUrl: '',
         date_of_birth: dateFormat(date, 'isoDate'),
       });
       if (!error) {
@@ -232,7 +232,7 @@ const signup = (props: Props) => {
               Gender
             </Text>
             <View style={styles2.border}>
-              <RNPickerSelect
+              {/* <RNPickerSelect
                 value={gender}
                 onValueChange={handleChange('gender')}
                 items={[
@@ -240,7 +240,7 @@ const signup = (props: Props) => {
                   { label: 'Female', value: 'female' },
                 ]}
                 style={styles}
-              />
+              />*/}
             </View>
             {touched.gender && errors.gender && (
               <Text style={{ color: 'red', fontWeight: 'bold' }}>

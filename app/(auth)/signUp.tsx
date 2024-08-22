@@ -6,7 +6,7 @@ import {
   StyleSheet,
   TextInput,
 } from 'react-native';
-import { useSignUp, useUser } from '@clerk/clerk-expo';
+
 import { InputComponent } from '@/components/InputComponent';
 import { Center, VStack } from '@gluestack-ui/themed';
 import { AuthTitle } from '@/components/AuthTitle';
@@ -47,11 +47,10 @@ const validationSchema = yup.object().shape({
 });
 const array = Array(6).fill(0);
 export default function SignUpScreen() {
-  const { isLoaded, signUp, setActive } = useSignUp();
   const [otp, setOtp] = useState([...array]);
   const inputRef = useRef<TextInput>(null);
   const [activeOtpIndex, setActiveOtpIndex] = useState(0);
-  const { user } = useUser();
+
   const router = useRouter();
 
   const [pendingVerification, setPendingVerification] = useState(false);

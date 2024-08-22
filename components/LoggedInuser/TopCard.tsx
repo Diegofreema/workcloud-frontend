@@ -1,13 +1,11 @@
-import { Button, HStack, VStack } from '@gluestack-ui/themed';
+import { HStack, VStack } from '@gluestack-ui/themed';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { MyText } from '../Ui/MyText';
-import { Image } from 'expo-image';
 import { colors } from '../../constants/Colors';
 import { Link, useRouter } from 'expo-router';
-import {} from '@clerk/clerk-expo';
+
 import { UserPreview } from '../Ui/UserPreview';
 import { useData } from '@/hooks/useData';
-import { MyButton } from '../Ui/MyButton';
 import { useDarkMode } from '@/hooks/useDarkMode';
 type Props = {
   id?: string;

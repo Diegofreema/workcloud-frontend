@@ -16,7 +16,7 @@ import {
   Workers,
   connections,
 } from '../constants/types';
-import { useAuth } from '@clerk/clerk-expo';
+
 const api = process.env.EXPO_PUBLIC_BACKEND_API!;
 export const useFollowers = () => {
   const getFollowers = async () => {
@@ -264,12 +264,11 @@ export const useSearchName = (value: string) => {
   });
 };
 export const useWorkers = () => {
-  const { userId } = useAuth();
   const getWorkers = async () => {
     const { data, error } = await supabase
       .from('workers')
       .select()
-      .eq('userId', userId);
+      .eq('userId', '');
 
     return {
       worker: data as Workers[],

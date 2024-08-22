@@ -17,7 +17,7 @@ import { useDetailsToAdd } from '@/hooks/useDetailsToAdd';
 import { useSaved } from '@/hooks/useSaved';
 import { CompleteDialog } from '@/components/Dialogs/SavedDialog';
 import { supabase } from '@/lib/supabase';
-import { useAuth } from '@clerk/clerk-expo';
+
 import Toast from 'react-native-toast-message';
 import { useQueryClient } from '@tanstack/react-query';
 import { useData } from '@/hooks/useData';
