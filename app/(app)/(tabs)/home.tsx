@@ -1,69 +1,71 @@
 import { FlatList, StyleSheet } from 'react-native';
 
-import { useRouter } from 'expo-router';
-import { defaultStyle } from '../../../constants';
 import { Header } from '../../../components/Header';
 import { ProfileHeader } from '../../../components/ProfileHeader';
 import { colors } from '../../../constants/Colors';
-import { useGetConnection, useProfile } from '../../../lib/queries';
+import { useGetConnection } from '../../../lib/queries';
 import { useEffect, useState } from 'react';
 import { useOrganizationModal } from '../../../hooks/useOrganizationModal';
 import { OrganizationModal } from '../../../components/OrganizationModal';
 import { HeadingText } from '../../../components/Ui/HeadingText';
 import { LoadingComponent } from '@/components/Ui/LoadingComponent';
 import { ErrorComponent } from '@/components/Ui/ErrorComponent';
-import { useQueryClient } from '@tanstack/react-query';
+import { QueryClient, useQueryClient } from '@tanstack/react-query';
 import { useData } from '@/hooks/useData';
 import { Profile } from '../../../constants/types';
 import { EmptyText } from '@/components/EmptyText';
 import { Item } from '@/components/Item';
 import { supabase } from '@/lib/supabase';
-import { View } from '@/components/Themed';
 import { Container } from '@/components/Ui/Container';
 import { Box } from '@gluestack-ui/themed';
 
+const queryClient = new QueryClient();
+
+const getFn = async (id: string) => {
+  try {
+    const getProfile = async () => {
+      const { data, error } = await supabase
+        .from('user')
+        .select(
+          `name, avatar, streamToken, email, userId, organizationId (*), workerId (*)`
+        )
+        .eq('userId', id)
+        .single();
+
+      return data;
+    };
+    const res = await queryClient.fetchQuery({
+      queryKey: ['profile', id],
+      queryFn: getProfile,
+    });
+    console.log(res);
+
+    return res;
+  } catch (error) {
+    return {};
+  }
+};
 export default function TabOneScreen() {
   const { id, user } = useData();
-  console.log({ user });
 
-  const { data, isError, isPending, isPaused, refetch } = useProfile(id);
-
+  // const { data, isError, isPending, isPaused, refetch } = useProfile(id);
+  const [profile, setProfile] = useState<Profile | null>(null);
   const queryClient = useQueryClient();
-
   useEffect(() => {
-    const getFn = async () => {
-      try {
-        const getProfile = async () => {
-          const { data, error } = await supabase
-            .from('user')
-            .select(
-              `name, avatar, streamToken, email, userId, organizationId (*), workerId (*)`
-            )
-            .eq('userId', id)
-            .single();
-          // @ts-ignore
-          setProfile(data);
-          return data;
-        };
-        const res = await queryClient.fetchQuery({
-          queryKey: ['profile', id],
-          queryFn: getProfile,
-        });
-
-        return res;
-      } catch (error) {
-        console.log(error);
-        return {};
-      }
+    const getData = async () => {
+      const data = await getFn(id);
+      // @ts-ignore
+      setProfile(data);
     };
-    getFn();
+
+    getData();
   }, [id]);
   useEffect(() => {
-    if (!data?.profile) return;
-    if (!data?.profile?.organizationId?.id && !data?.profile?.workerId?.id) {
+    if (!profile) return;
+    if (!profile?.organizationId?.id && !profile?.workerId?.id) {
       onOpen();
     }
-  }, [data?.profile]);
+  }, [profile?.organizationId?.id, profile?.workerId?.id]);
   const {
     data: connections,
     refetch: refetchConnections,
@@ -75,22 +77,25 @@ export default function TabOneScreen() {
   } = useGetConnection(id);
 
   const { onOpen } = useOrganizationModal();
-  const handleRefetch = () => {
+  const handleRefetch = async () => {
     refetchConnections();
+    const data = await getFn(id);
+    // @ts-ignore
+    setProfile(data);
   };
 
-  if (isErrorConnections || isConnectionsPaused || isError || isPaused) {
+  if (isErrorConnections || isConnectionsPaused) {
     return <ErrorComponent refetch={handleRefetch} />;
   }
 
-  if (isPendingConnections || isPending) {
+  if (!profile?.userId || isPendingConnections) {
     return <LoadingComponent />;
   }
 
   const { connections: connectionsData } = connections;
 
   const firstTen = connectionsData?.slice(0, 10);
-  const { profile } = data;
+  // const { profile } = data;
 
   return (
     <Container>

@@ -12,6 +12,9 @@ import { supabase } from '@/lib/supabase';
 import Toast from 'react-native-toast-message';
 import { Button } from 'react-native-paper';
 import { useData } from '@/hooks/useData';
+import { useOpen } from '@/hooks/useOpen';
+import { checkIfEmployed } from '@/lib/helper';
+import { useInfos } from '@/hooks/useGetInfo';
 
 type PreviewWorker = {
   name: any;
@@ -124,16 +127,26 @@ export const UserPreview = ({
 
 export const WorkPreview = ({ item }: { item: Requests }) => {
   const { id: userId } = useData();
+  const { onOpen } = useOpen();
+  const { getInfoIds } = useInfos();
   const [cancelling, setCancelling] = useState(false);
   const [accepting, setAccepting] = useState(false);
   const { id, role, from, to, workspaceId, salary, responsibility, qualities } =
     item;
-  console.log(workspaceId);
-
-  const queryClient = useQueryClient();
 
   const acceptRequest = async () => {
     setAccepting(true);
+    const isWorking = await checkIfEmployed(userId);
+    if (isWorking?.userId) {
+      onOpen();
+      getInfoIds({
+        newWorkspaceId: workspaceId as string,
+        requestId: id,
+        workerId: isWorking?.userId,
+        workspaceId: isWorking?.id,
+      });
+      return;
+    }
     try {
       const { error } = await supabase
         .from('workspace')

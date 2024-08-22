@@ -199,3 +199,26 @@ export const onUnFollow = async (id: number, name: string, userId: string) => {
     });
   }
 };
+
+export const checkIfEmployed = async (userId: string) => {
+  try {
+    const { data, error } = await supabase
+      .from('workspace')
+      .select()
+      .eq('workerId', userId)
+      .single();
+
+    if (error) {
+      console.log(error);
+      throw error.message;
+    }
+
+    if (!error && data?.workerId) {
+      return data;
+    }
+    return null;
+  } catch (error: any) {
+    console.log(error);
+    throw error?.message;
+  }
+};
