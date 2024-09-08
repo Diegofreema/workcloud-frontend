@@ -61,16 +61,16 @@ export default function TabLayout() {
             tabBarIcon: ({ focused, size }) => (
               <TabBarIcon
                 name="home"
-                color={focused ? colors.buttonBlue : colors.gray}
+                color={focused ? colors.buttonBlue : colors.grayText}
                 size={size}
               />
             ),
             tabBarLabel: ({ focused }) => (
               <Text
                 style={{
-                  color: focused ? colors.buttonBlue : colors.gray,
+                  color: focused ? colors.buttonBlue : colors.grayText,
                   fontFamily: fontFamily.Bold,
-                  fontSize: 7,
+                  fontSize: 10,
                 }}
               >
                 Home
@@ -86,7 +86,7 @@ export default function TabLayout() {
               <View>
                 <TabBarIcon
                   name="envelope"
-                  color={focused ? colors.buttonBlue : colors.gray}
+                  color={focused ? colors.buttonBlue : colors.grayText}
                   size={size}
                 />
                 {unread > 0 && (
@@ -105,9 +105,9 @@ export default function TabLayout() {
             tabBarLabel: ({ focused }) => (
               <Text
                 style={{
-                  color: focused ? colors.buttonBlue : colors.gray,
+                  color: focused ? colors.buttonBlue : colors.grayText,
                   fontFamily: fontFamily.Bold,
-                  fontSize: 7,
+                  fontSize: 10,
                 }}
               >
                 Messages
@@ -122,16 +122,16 @@ export default function TabLayout() {
             tabBarIcon: ({ focused, size }) => (
               <TabBarIcon
                 name="briefcase"
-                color={focused ? colors.buttonBlue : colors.gray}
+                color={focused ? colors.buttonBlue : colors.grayText}
                 size={size}
               />
             ),
             tabBarLabel: ({ focused }) => (
               <Text
                 style={{
-                  color: focused ? colors.buttonBlue : colors.gray,
+                  color: focused ? colors.buttonBlue : colors.grayText,
                   fontFamily: fontFamily.Bold,
-                  fontSize: 7,
+                  fontSize: 10,
                 }}
               >
                 Organizations

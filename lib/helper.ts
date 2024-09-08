@@ -5,6 +5,14 @@ import { supabase } from './supabase';
 import { router } from 'expo-router';
 import { QueryClient } from '@tanstack/react-query';
 const queryClient = new QueryClient();
+type User = {
+  email: string;
+  userId: string;
+  name: string;
+  phoneNumber: string;
+  streamToken: string;
+  avatar: string;
+};
 export const createOrg = async (orgData: Org) => {
   try {
     const { data } = await axios.post(
@@ -18,6 +26,49 @@ export const createOrg = async (orgData: Org) => {
   }
 };
 
+export const createToken = async (userId: string) => {
+  try {
+    const { data: axiosData } = await axios.post(
+      'http://localhost:8989/create-token',
+      {
+        id: userId,
+      }
+    );
+
+    return axiosData.streamToken;
+  } catch (error) {
+    console.log(error);
+  }
+};
+export const checkIfUserExistsFn = async (email: string) => {
+  try {
+    const { data: dt, error: err } = await supabase
+      .from('user')
+      .select()
+      .eq('email', email)
+      .single();
+
+    return dt;
+  } catch (error: any) {
+    console.log(error);
+
+    return null;
+  }
+};
+
+export const createUser = async (user: User) => {
+  try {
+    const { data, error } = await supabase
+      .from('user')
+      .insert(user)
+      .select()
+      .single();
+    return data;
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
+};
 export const updateOrg = async (orgData: Org) => {
   try {
     const { data } = await axios.post(
@@ -46,7 +97,7 @@ export const uploadPostImage = async (
 ) => {
   const { error } = await supabase
     .from('posts')
-    .insert({ postUrl, organizationId });
+    .insert({ postUrl, organizationId: Number(organizationId) });
   if (error) {
     throw error.message;
   }
@@ -69,7 +120,7 @@ export const exitWaitList = async (workspaceId: number, customerId: string) => {
     const { error } = await supabase
       .from('waitList')
       .delete()
-      .eq('customer', customerToRemove?.customer);
+      .eq('customer', customerToRemove?.customer as string);
   }
 
   router.back();

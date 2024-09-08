@@ -1,71 +1,40 @@
 import { FlatList, StyleSheet } from 'react-native';
 
-import { Header } from '../../../components/Header';
-import { ProfileHeader } from '../../../components/ProfileHeader';
-import { colors } from '../../../constants/Colors';
-import { useGetConnection } from '../../../lib/queries';
-import { useEffect, useState } from 'react';
-import { useOrganizationModal } from '../../../hooks/useOrganizationModal';
-import { OrganizationModal } from '../../../components/OrganizationModal';
-import { HeadingText } from '../../../components/Ui/HeadingText';
-import { LoadingComponent } from '@/components/Ui/LoadingComponent';
-import { ErrorComponent } from '@/components/Ui/ErrorComponent';
-import { QueryClient, useQueryClient } from '@tanstack/react-query';
-import { useData } from '@/hooks/useData';
-import { Profile } from '../../../constants/types';
 import { EmptyText } from '@/components/EmptyText';
 import { Item } from '@/components/Item';
-import { supabase } from '@/lib/supabase';
 import { Container } from '@/components/Ui/Container';
+import { ErrorComponent } from '@/components/Ui/ErrorComponent';
+import { LoadingComponent } from '@/components/Ui/LoadingComponent';
+import { useAuth } from '@/hooks/useAuth';
 import { Box } from '@gluestack-ui/themed';
+import { useEffect } from 'react';
+import { Header } from '../../../components/Header';
+import { OrganizationModal } from '../../../components/OrganizationModal';
+import { ProfileHeader } from '../../../components/ProfileHeader';
+import { HeadingText } from '../../../components/Ui/HeadingText';
+import { colors } from '../../../constants/Colors';
+import { useOrganizationModal } from '../../../hooks/useOrganizationModal';
+import { useGetConnection } from '../../../lib/queries';
+import { useUser } from '@clerk/clerk-expo';
+import { Redirect } from 'expo-router';
 
-const queryClient = new QueryClient();
-
-const getFn = async (id: string) => {
-  try {
-    const getProfile = async () => {
-      const { data, error } = await supabase
-        .from('user')
-        .select(
-          `name, avatar, streamToken, email, userId, organizationId (*), workerId (*)`
-        )
-        .eq('userId', id)
-        .single();
-
-      return data;
-    };
-    const res = await queryClient.fetchQuery({
-      queryKey: ['profile', id],
-      queryFn: getProfile,
-    });
-    console.log(res);
-
-    return res;
-  } catch (error) {
-    return {};
-  }
-};
 export default function TabOneScreen() {
-  const { id, user } = useData();
+  const { isLoaded, isSignedIn } = useUser();
+  const {
+    data,
+    isError,
+    isPending,
+    isPaused,
+    refetch,
+    error: errorAuth,
+  } = useAuth();
 
-  // const { data, isError, isPending, isPaused, refetch } = useProfile(id);
-  const [profile, setProfile] = useState<Profile | null>(null);
-  const queryClient = useQueryClient();
   useEffect(() => {
-    const getData = async () => {
-      const data = await getFn(id);
-      // @ts-ignore
-      setProfile(data);
-    };
-
-    getData();
-  }, [id]);
-  useEffect(() => {
-    if (!profile) return;
-    if (!profile?.organizationId?.id && !profile?.workerId?.id) {
+    if (!data) return;
+    if (!data?.organizationId && !data?.workerId) {
       onOpen();
     }
-  }, [profile?.organizationId?.id, profile?.workerId?.id]);
+  }, [data?.organizationId, data?.workerId]);
   const {
     data: connections,
     refetch: refetchConnections,
@@ -74,38 +43,38 @@ export default function TabOneScreen() {
     isPending: isPendingConnections,
     error,
     isPaused: isConnectionsPaused,
-  } = useGetConnection(id);
+  } = useGetConnection(data?.userId || '');
 
   const { onOpen } = useOrganizationModal();
-  const handleRefetch = async () => {
+  const handleRefetch = () => {
+    refetch();
     refetchConnections();
-    const data = await getFn(id);
-    // @ts-ignore
-    setProfile(data);
   };
-
-  if (isErrorConnections || isConnectionsPaused) {
-    return <ErrorComponent refetch={handleRefetch} />;
+  if (!isSignedIn) {
+    return <Redirect href="/" />;
   }
+  if (isError || isErrorConnections || isConnectionsPaused) {
+    return <ErrorComponent refetch={refetch} />;
+  }
+  console.log(isPending, isPendingConnections);
 
-  if (!profile?.userId || isPendingConnections) {
+  if (isPending || isPendingConnections) {
     return <LoadingComponent />;
   }
 
   const { connections: connectionsData } = connections;
 
   const firstTen = connectionsData?.slice(0, 10);
-  // const { profile } = data;
 
   return (
     <Container>
       <OrganizationModal />
       <Header />
       <ProfileHeader
-        id={profile?.userId}
-        avatar={profile?.avatar}
-        name={profile?.name}
-        email={profile?.email}
+        id={data?.userId!}
+        avatar={data?.avatar!}
+        name={data?.name!}
+        email={data?.email!}
       />
 
       <Box style={{ marginVertical: 10 }}>

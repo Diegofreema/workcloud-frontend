@@ -5,25 +5,40 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/appIcon.png",
-    "scheme": "workcloud",
+    "scheme": "com.diegodark.workcloud",
     "userInterfaceStyle": "automatic",
     "splash": {
       "image": "./assets/images/splash.png",
       "resizeMode": "cover",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bitcode": false,
+      "bundleIdentifier": "com.diegodark.workcloud"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/appIcon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.diegodark.workcloud"
+      "package": "com.diegodark.workcloud",
+      "permissions": [
+        "android.permission.POST_NOTIFICATIONS",
+        "android.permission.FOREGROUND_SERVICE",
+        "android.permission.FOREGROUND_SERVICE_MICROPHONE",
+        "android.permission.BLUETOOTH",
+        "android.permission.BLUETOOTH_CONNECT",
+        "android.permission.BLUETOOTH_ADMIN",
+        "android.permission.ACCESS_NETWORK_STATE",
+        "android.permission.CAMERA",
+        "android.permission.INTERNET",
+        "android.permission.MODIFY_AUDIO_SETTINGS",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.SYSTEM_ALERT_WINDOW",
+        "android.permission.WAKE_LOCK"
+      ]
     },
     "web": {
       "bundler": "metro",
@@ -58,7 +73,8 @@
           "android": {
             "extraMavenRepos": [
               "./node_modules/@notifee/react-native/android/libs"
-            ]
+            ],
+            "enableDexingArtifactTransform": false
           }
         }
       ],
@@ -69,7 +85,7 @@
     },
     "extra": {
       "router": {
-        "origin": false
+        "origin": "http://localhost:8081"
       },
       "eas": {
         "projectId": "c6f4d0db-820e-41f4-9840-49346d4a94af"

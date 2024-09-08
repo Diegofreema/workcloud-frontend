@@ -28,12 +28,14 @@ export const MyButton = ({
       {...props}
       loading={loading}
       rippleColor={colors.ripple}
-      contentStyle={[contentStyle]}
+      contentStyle={[contentStyle, { height: 50, alignItems: 'center' }]}
       textColor={textColor}
       buttonColor={buttonColor}
       style={[
         {
           borderRadius: 5,
+          height: 50,
+          alignItems: 'center',
         },
         style,
       ]}

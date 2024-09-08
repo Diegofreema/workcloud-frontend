@@ -16,7 +16,7 @@ import Toast from 'react-native-toast-message';
 import { GluestackUIProvider, StatusBar } from '@gluestack-ui/themed';
 import { config } from '@gluestack-ui/config';
 import { useDarkMode } from '@/hooks/useDarkMode';
-
+import { ClerkProvider, useAuth } from '@clerk/clerk-expo';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { PermissionsAndroid, Platform } from 'react-native';
@@ -29,6 +29,31 @@ export {
 export const unstable_settings = {
   // Ensure that reloading on `/modal` keeps a back button present.
   initialRouteName: '(tabs)',
+};
+
+const tokenCache = {
+  async getToken(key: string) {
+    try {
+      const item = await SecureStore.getItemAsync(key);
+      if (item) {
+        console.log(`${key} was used 🔐 \n`);
+      } else {
+        console.log('No values stored under key: ' + key);
+      }
+      return item;
+    } catch (error) {
+      console.error('SecureStore get item error: ', error);
+      await SecureStore.deleteItemAsync(key);
+      return null;
+    }
+  },
+  async saveToken(key: string, value: string) {
+    try {
+      return SecureStore.setItemAsync(key, value);
+    } catch (err) {
+      return;
+    }
+  },
 };
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
@@ -85,16 +110,25 @@ export default function RootLayout() {
   if (!loaded) {
     return null;
   }
+  const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!;
+
+  if (!publishableKey) {
+    throw new Error(
+      'Missing Publishable Key. Please set EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY in your .env'
+    );
+  }
 
   return (
-    <GluestackUIProvider config={config}>
-      <QueryClientProvider client={queryClient}>
-        <PaperProvider>
-          <RootLayoutNav />
-          <Toast />
-        </PaperProvider>
-      </QueryClientProvider>
-    </GluestackUIProvider>
+    <ClerkProvider publishableKey={publishableKey} tokenCache={tokenCache}>
+      <GluestackUIProvider config={config}>
+        <QueryClientProvider client={queryClient}>
+          <PaperProvider>
+            <RootLayoutNav />
+            <Toast />
+          </PaperProvider>
+        </QueryClientProvider>
+      </GluestackUIProvider>
+    </ClerkProvider>
   );
 }
 

@@ -1,6 +1,13 @@
-import { StyleSheet, StyleProp, TextStyle, Text } from 'react-native';
+import {
+  StyleSheet,
+  StyleProp,
+  TextStyle,
+  Text,
+  useWindowDimensions,
+} from 'react-native';
 import { fontFamily } from '../../constants';
 import { useDarkMode } from '../../hooks/useDarkMode';
+import { RFValue } from 'react-native-responsive-fontsize';
 
 type Props = {
   style?: StyleProp<TextStyle>;
@@ -13,15 +20,16 @@ export const MyText = ({
   children,
   poppins,
   style,
-  fontSize = 9,
+  fontSize = 10,
 }: Props): JSX.Element => {
   const { darkMode } = useDarkMode();
+  const { height } = useWindowDimensions();
   return (
     <Text
       style={[
         {
           fontFamily: fontFamily[poppins],
-          fontSize,
+          fontSize: RFValue(fontSize, height),
           color: darkMode === 'dark' ? 'white' : 'black',
         },
         style,

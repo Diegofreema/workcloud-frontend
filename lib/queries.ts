@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from './supabase';
 import {
+  Connection,
   ConnectionType,
   Followers,
   Org,
@@ -358,7 +359,7 @@ export const useGetConnection = (id: any) => {
       .eq('owner', id);
 
     return {
-      connections: data as ConnectionType[],
+      connections: data as Connection[],
       error,
     };
   };

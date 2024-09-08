@@ -1,16 +1,14 @@
-import React from 'react';
-import { useLocalSearchParams } from 'expo-router';
-import { HeaderNav } from '../../components/HeaderNav';
-import { ProfileUpdateForm } from '../../components/Forms/ProfileUpdateForm';
-import { CompleteDialog } from '../../components/Dialogs/SavedDialog';
-import { Container } from '../../components/Ui/Container';
-import { useProfile } from '@/lib/queries';
 import { ErrorComponent } from '@/components/Ui/ErrorComponent';
 import { LoadingComponent } from '@/components/Ui/LoadingComponent';
+import { useProfile } from '@/lib/queries';
+import { useAuth } from '@clerk/clerk-expo';
+import { CompleteDialog } from '../../components/Dialogs/SavedDialog';
+import { ProfileUpdateForm } from '../../components/Forms/ProfileUpdateForm';
+import { HeaderNav } from '../../components/HeaderNav';
+import { Container } from '../../components/Ui/Container';
 
 const Update = () => {
-  const { userId } = useLocalSearchParams<{ userId: string }>();
-
+  const { userId } = useAuth();
   const { data, isError, isPending, isPaused, refetch } = useProfile(userId);
 
   if (isError || isPaused) {

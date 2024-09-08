@@ -27,7 +27,6 @@ export const HeaderNav = ({
   return (
     <View
       style={{
-        paddingVertical: 5,
         flexDirection: 'row',
         justifyContent: 'space-between',
         backgroundColor: darkMode === 'dark' ? 'black' : 'white',

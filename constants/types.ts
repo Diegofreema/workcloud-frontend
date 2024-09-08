@@ -1,3 +1,5 @@
+import { Database } from '@/supabse';
+
 export type connections =
   | {
       name: string;
@@ -6,6 +8,14 @@ export type connections =
       time: string;
     }[]
   | null;
+
+export type UserProfile = Database['public']['Tables']['user']['Row'];
+export type Connection = {
+  connectedTo: Org;
+  created_at: string;
+  id: number;
+  owner: string;
+};
 
 export type Organization = {
   avatar: string;

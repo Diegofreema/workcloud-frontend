@@ -1,14 +1,14 @@
-import { StyleSheet, ScrollView, Pressable, View } from 'react-native';
 import { HStack, VStack } from '@gluestack-ui/themed';
 import { Image } from 'expo-image';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 
-import { router, useLocalSearchParams } from 'expo-router';
-import { MyText } from '../Ui/MyText';
-import { colors } from '../../constants/Colors';
-import { useData } from '@/hooks/useData';
-import { FontAwesome } from '@expo/vector-icons';
 import { chatApiKey } from '@/chatConfig';
+import { useAuth } from '@clerk/clerk-expo';
+import { FontAwesome } from '@expo/vector-icons';
+import { router, useLocalSearchParams } from 'expo-router';
 import { StreamChat } from 'stream-chat';
+import { colors } from '../../constants/Colors';
+import { MyText } from '../Ui/MyText';
 
 const chatClient = StreamChat.getInstance(chatApiKey);
 type Props = {
@@ -22,9 +22,9 @@ export const call = {
 
 const fourItems = [1, 2, 3];
 export const BottomCard = ({ workId }: Props): JSX.Element => {
-  console.log('🚀 ~ BottomCard ~ workId:', workId);
+  const { signOut } = useAuth();
+
   const { records } = useLocalSearchParams();
-  const { removeId } = useData();
 
   const handleNavigate = () => {
     router.push('/settings');
@@ -32,8 +32,7 @@ export const BottomCard = ({ workId }: Props): JSX.Element => {
 
   const logout = () => {
     chatClient.disconnectUser();
-    removeId();
-
+    signOut();
     router.replace('/');
   };
   const onPress = () => {

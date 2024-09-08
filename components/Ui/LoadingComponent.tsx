@@ -1,10 +1,8 @@
-import { StyleSheet, useColorScheme } from 'react-native';
+import { useDarkMode } from '@/hooks/useDarkMode';
+import { Box } from '@gluestack-ui/themed';
+import { StyleSheet } from 'react-native';
 import { ActivityIndicator } from 'react-native-paper';
 import { defaultStyle } from '../../constants/index';
-import { View } from '../Themed';
-import { Container } from './Container';
-import { Box } from '@gluestack-ui/themed';
-import { useDarkMode } from '@/hooks/useDarkMode';
 
 type Props = {};
 

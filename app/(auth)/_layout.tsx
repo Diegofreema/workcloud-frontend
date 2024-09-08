@@ -1,23 +1,18 @@
-import React, { useCallback, useEffect } from 'react';
-import { Redirect, Stack } from 'expo-router';
-import { useData } from '@/hooks/useData';
-import { StatusBar } from '@gluestack-ui/themed';
+import { LoadingComponent } from '@/components/Ui/LoadingComponent';
 import { useDarkMode } from '@/hooks/useDarkMode';
+import { useUser } from '@clerk/clerk-expo';
+import { StatusBar } from '@gluestack-ui/themed';
+import { Redirect, Stack } from 'expo-router';
 
-type Props = {};
-
-const AuthLayout = (props: Props) => {
-  const { getValues, id, user } = useData();
+const AuthLayout = () => {
+  const { isSignedIn, isLoaded } = useUser();
   const { darkMode } = useDarkMode();
 
-  const getUserStored = useCallback(() => {
-    getValues();
-  }, []);
-  useEffect(() => {
-    getUserStored();
-  }, []);
+  if (!isLoaded) {
+    return <LoadingComponent />;
+  }
 
-  if (id && user?.id) {
+  if (isSignedIn) {
     return <Redirect href={'/home'} />;
   }
 

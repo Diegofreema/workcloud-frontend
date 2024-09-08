@@ -1,22 +1,17 @@
-import { FlatList, StyleSheet, Text, View } from 'react-native';
-import React, { ComponentType, useEffect } from 'react';
-import { useDarkMode } from '../../../hooks/useDarkMode';
+import { MyText } from '@/components/Ui/MyText';
 import { useRouter } from 'expo-router';
-import { TextComponents } from '../../../components/TextComponents';
-import { defaultStyle } from '../../../constants/index';
+import React, { useEffect } from 'react';
+import { StyleSheet, useWindowDimensions, View } from 'react-native';
 import {
-  ChannelAvatar,
   ChannelList,
   ChannelPreview,
   ChannelPreviewMessenger,
   ChannelPreviewMessengerProps,
   EmptyStateProps,
 } from 'stream-chat-expo';
-import { MyText } from '@/components/Ui/MyText';
+import { defaultStyle } from '../../../constants/index';
+import { useDarkMode } from '../../../hooks/useDarkMode';
 
-import { LoadingComponent } from '@/components/Ui/LoadingComponent';
-import { HStack } from '@gluestack-ui/themed';
-import { Image } from 'expo-image';
 import { colors } from '@/constants/Colors';
 import { useData } from '@/hooks/useData';
 import { useUnread } from '@/hooks/useUnread';
@@ -71,11 +66,11 @@ const List = () => {
 
 const EmptyComponent = ({ listType }: EmptyStateProps) => {
   const { darkMode } = useDarkMode();
-
+  const { height } = useWindowDimensions();
   return (
     <View
       style={{
-        flex: 1,
+        height: height * 0.8,
         alignItems: 'center',
         justifyContent: 'center',
         backgroundColor: darkMode === 'dark' ? 'black' : 'white',

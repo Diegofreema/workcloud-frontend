@@ -1,43 +1,40 @@
-import { EvilIcons, FontAwesome } from '@expo/vector-icons';
-import { Button, Center, HStack, VStack } from '@gluestack-ui/themed';
-import PhoneInput from 'react-native-phone-input';
-import { Image } from 'expo-image';
-import { SelectList } from 'react-native-dropdown-select-list';
-import {
-  StyleSheet,
-  View,
-  Platform,
-  ScrollView,
-  Pressable,
-  TouchableOpacity,
-} from 'react-native';
-import * as ImagePicker from 'expo-image-picker';
-import { useEffect, useRef, useState } from 'react';
-import DateTimePicker from '@react-native-community/datetimepicker';
-import { MyText } from '../Ui/MyText';
-import { InputComponent } from '../InputComponent';
-import { colors } from '../../constants/Colors';
-import { MyButton } from '../Ui/MyButton';
-import { useFormik } from 'formik';
-import * as yup from 'yup';
-import { useSaved } from '../../hooks/useSaved';
-import { Person, Profile } from '@/constants/types';
-import { format } from 'date-fns';
-import Toast from 'react-native-toast-message';
-import axios from 'axios';
-import { useQueryClient } from '@tanstack/react-query';
-import { router } from 'expo-router';
-import { supabase } from '@/lib/supabase';
-import { useData } from '@/hooks/useData';
-import { LoadingComponent } from '../Ui/LoadingComponent';
-import { onDeleteImage } from '@/lib/helper';
+import { Profile } from '@/constants/types';
 import { useDarkMode } from '@/hooks/useDarkMode';
+import { useData } from '@/hooks/useData';
+import { onDeleteImage } from '@/lib/helper';
+import { supabase } from '@/lib/supabase';
+import { FontAwesome } from '@expo/vector-icons';
+import { Button, HStack, VStack } from '@gluestack-ui/themed';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import { useQueryClient } from '@tanstack/react-query';
+import { format } from 'date-fns';
+import { Image } from 'expo-image';
+import * as ImagePicker from 'expo-image-picker';
+import { router } from 'expo-router';
+import { useFormik } from 'formik';
+import { useEffect, useState } from 'react';
+import {
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import Toast from 'react-native-toast-message';
+import * as yup from 'yup';
+import { colors } from '../../constants/Colors';
+import { useSaved } from '../../hooks/useSaved';
+import { InputComponent } from '../InputComponent';
+import { LoadingComponent } from '../Ui/LoadingComponent';
+import { MyButton } from '../Ui/MyButton';
+import { MyText } from '../Ui/MyText';
+import { useUser } from '@clerk/clerk-expo';
+import { ActivityIndicator } from 'react-native-paper';
 const validationSchema = yup.object().shape({
   firstName: yup.string().required('First name is required'),
   lastName: yup.string().required('Last name is required'),
-  email: yup.string().email('Invalid email'),
   avatar: yup.string().required('Profile image is required'),
-  date_of_birth: yup.string(),
   phoneNumber: yup.string(),
 });
 export const ProfileUpdateForm = ({
@@ -45,8 +42,9 @@ export const ProfileUpdateForm = ({
 }: {
   person: Profile | null | undefined;
 }): JSX.Element => {
-  const { id } = useData();
+  const { user } = useUser();
   const queryClient = useQueryClient();
+  const [loading, setLoading] = useState(false);
   const { onOpen } = useSaved();
   const {
     handleSubmit,
@@ -68,33 +66,38 @@ export const ProfileUpdateForm = ({
     },
     validationSchema,
     onSubmit: async () => {
-      const { date_of_birth, email, firstName, lastName, phoneNumber, avatar } =
-        values;
+      const { firstName, lastName, phoneNumber, avatar } = values;
 
       try {
+        user?.update({
+          firstName,
+          lastName,
+          primaryPhoneNumberId: phoneNumber,
+        });
+
         const { error } = await supabase
           .from('user')
           .update({
-            avatar: avatar,
+            avatar: user?.imageUrl,
             name: `${firstName} ${lastName}`,
-            email: email,
-            birthday: date_of_birth,
             phoneNumber: phoneNumber,
           })
-          .eq('userId', id);
+          .eq('userId', user?.id!);
 
         if (!error) {
           Toast.show({
             type: 'success',
             text1: 'Profile updated successfully',
           });
+          resetForm();
+          router.back();
           queryClient.invalidateQueries({
-            queryKey: ['profile', id],
+            queryKey: ['profile'],
           });
         }
 
         if (error) {
-          console.log(error, 'Error');
+          console.log(JSON.stringify(error, null, 2), 'Error');
           Toast.show({
             type: 'error',
             text1: 'Error updating profile',
@@ -107,22 +110,11 @@ export const ProfileUpdateForm = ({
         });
         console.log(error, 'Error');
       }
-
-      resetForm();
-
-      router.back();
     },
   });
 
-  const [inputDate, setInputDate] = useState<Date | undefined>(undefined);
-  console.log(values.avatar);
   const [path, setPath] = useState('');
   const { darkMode } = useDarkMode();
-  const [date, setDate] = useState(new Date());
-  const [dateOfBirth, setDateOfBirth] = useState(
-    new Date().toISOString().split('T')[0]
-  );
-  const [showPicker, setShowPicker] = useState(false);
 
   useEffect(() => {
     if (person) {
@@ -139,81 +131,28 @@ export const ProfileUpdateForm = ({
   const pickImageAsync = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       allowsEditing: true,
-      quality: 1,
+      quality: 0.75,
       base64: true,
     });
 
     // Save image if not cancelled
     if (!result.canceled) {
-      const image = result.assets[0];
-
-      const arraybuffer = await fetch(image.uri).then((res) =>
-        res.arrayBuffer()
-      );
-
-      const fileExt = image.uri?.split('.').pop()?.toLowerCase() ?? 'jpeg';
-      const path = `${Date.now()}.${fileExt}`;
+      const base64Image = `data:image/png;base64,${result.assets[0].base64}`;
       try {
-        const { data, error: uploadError } = await supabase.storage
-          .from('avatars/profile')
-          .upload(path, arraybuffer, {
-            contentType: image.mimeType ?? 'image/jpeg',
-          });
-
-        if (uploadError) {
-          throw uploadError.message;
-        }
-
-        if (!uploadError) {
-          setPath(data?.path);
-          setFieldValue(
-            'avatar',
-            // @ts-ignore
-            `https://mckkhgmxgjwjgxwssrfo.supabase.co/storage/v1/object/public/${data?.fullPath}`
-          );
-        }
+        setLoading(true);
+        user?.setProfileImage({ file: base64Image });
       } catch (error) {
+        console.log(JSON.stringify(error, null, 1));
+
         Toast.show({
           type: 'error',
           text1: 'Something went wrong',
           text2: 'Failed to upload image',
         });
+      } finally {
+        setLoading(false);
       }
     }
-  };
-
-  const onHideDatePicker = () => {
-    setShowPicker(false);
-  };
-
-  const onShowDatePicker = () => {
-    setShowPicker(true);
-  };
-
-  const onChange = (event: any, selectedDate: any) => {
-    if (event.type === 'set') {
-      const currentDate = selectedDate;
-      setDate(currentDate);
-      if (Platform.OS === 'android') {
-        setDateOfBirth(currentDate.toISOString().split('T')[0]);
-        setFieldValue(
-          'date_of_birth',
-          format(currentDate.toISOString(), 'yyyy-MM-dd')
-        );
-        onHideDatePicker();
-      }
-    }
-  };
-
-  const onConfirmIos = () => {
-    setDateOfBirth(inputDate?.toISOString().split('T')[0] || '');
-    setFieldValue('date_of_birth', dateOfBirth);
-    onHideDatePicker();
-  };
-  const handleDeleteImage = () => {
-    setFieldValue('avatar', '');
-
-    onDeleteImage(`logo/${path}`);
   };
 
   if (!person) return <LoadingComponent />;
@@ -234,18 +173,23 @@ export const ProfileUpdateForm = ({
           <Image
             contentFit="cover"
             style={{ width: 100, height: 100, borderRadius: 50 }}
-            source={{ uri: values.avatar }}
+            source={{ uri: user?.imageUrl }}
           />
-          {!values.avatar && (
+
+          {loading ? (
+            <ActivityIndicator
+              style={[
+                styles.abs,
+                { backgroundColor: darkMode ? 'white' : 'black' },
+              ]}
+              size={20}
+            />
+          ) : (
             <TouchableOpacity
-              style={{
-                position: 'absolute',
-                bottom: 0,
-                right: 3,
-                backgroundColor: darkMode ? 'white' : 'black',
-                padding: 5,
-                borderRadius: 30,
-              }}
+              style={[
+                styles.abs,
+                { backgroundColor: darkMode ? 'white' : 'black' },
+              ]}
               onPress={pickImageAsync}
             >
               <FontAwesome
@@ -253,21 +197,6 @@ export const ProfileUpdateForm = ({
                 size={20}
                 color={darkMode ? 'black' : 'white'}
               />
-            </TouchableOpacity>
-          )}
-          {values.avatar && (
-            <TouchableOpacity
-              style={{
-                position: 'absolute',
-                bottom: 0,
-                right: 3,
-                backgroundColor: darkMode ? 'white' : 'black',
-                padding: 5,
-                borderRadius: 30,
-              }}
-              onPress={handleDeleteImage}
-            >
-              <FontAwesome name="trash" size={20} color={'red'} />
             </TouchableOpacity>
           )}
         </View>
@@ -304,19 +233,6 @@ export const ProfileUpdateForm = ({
               </MyText>
             )}
           </>
-          <>
-            <InputComponent
-              label="Email"
-              onChangeText={handleChange('email')}
-              placeholder="Email"
-              value={values.email}
-            />
-            {touched.email && errors.email && (
-              <MyText poppins="Medium" style={styles.error}>
-                {errors.email}
-              </MyText>
-            )}
-          </>
 
           <>
             <InputComponent
@@ -328,84 +244,6 @@ export const ProfileUpdateForm = ({
             {touched.phoneNumber && errors.phoneNumber && (
               <MyText poppins="Medium" style={styles.error}>
                 {errors.phoneNumber}
-              </MyText>
-            )}
-          </>
-
-          <>
-            {showPicker && Platform.OS === 'android' && (
-              <DateTimePicker
-                mode="date"
-                display="spinner"
-                value={date}
-                onChange={onChange}
-              />
-            )}
-            {showPicker && Platform.OS === 'ios' && (
-              <>
-                <DateTimePicker
-                  mode="date"
-                  display="spinner"
-                  value={date}
-                  onChange={onChange}
-                  style={styles.date}
-                />
-                <HStack justifyContent="space-between" alignItems="center">
-                  <Button
-                    onPress={onHideDatePicker}
-                    style={{
-                      backgroundColor: colors.textGray,
-                      borderRadius: 10,
-                    }}
-                  >
-                    <MyText
-                      poppins="Medium"
-                      fontSize={12}
-                      style={{ color: 'black' }}
-                    >
-                      Cancel
-                    </MyText>
-                  </Button>
-                  <Button
-                    style={{
-                      backgroundColor: colors.dialPad,
-                      borderRadius: 10,
-                    }}
-                    onPress={onConfirmIos}
-                  >
-                    <MyText
-                      poppins="Medium"
-                      fontSize={12}
-                      style={{ color: 'white' }}
-                    >
-                      Confirm
-                    </MyText>
-                  </Button>
-                </HStack>
-              </>
-            )}
-
-            {Platform.OS === 'android' ? (
-              <Pressable onPress={onShowDatePicker}>
-                <InputComponent
-                  editable={false}
-                  label="Date Of Birth"
-                  placeholder="Date Of Birth"
-                  value={values.date_of_birth}
-                />
-              </Pressable>
-            ) : (
-              <InputComponent
-                editable={false}
-                label="Date Of Birth"
-                placeholder="Date Of Birth"
-                value={values.date_of_birth}
-                onPressIn={onShowDatePicker}
-              />
-            )}
-            {touched.date_of_birth && errors.date_of_birth && (
-              <MyText poppins="Medium" style={styles.error}>
-                {errors.date_of_birth}
               </MyText>
             )}
           </>
@@ -481,5 +319,13 @@ const styles = StyleSheet.create({
     color: 'black',
     fontFamily: 'PoppinsMedium',
     marginTop: 10,
+  },
+  abs: {
+    position: 'absolute',
+    bottom: 0,
+    right: 3,
+
+    padding: 5,
+    borderRadius: 30,
   },
 });

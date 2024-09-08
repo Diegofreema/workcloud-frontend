@@ -8,10 +8,10 @@ import { VStack } from '@gluestack-ui/themed';
 import { useData } from '@/hooks/useData';
 import { useChatContext } from 'stream-chat-expo';
 import { useRouter } from 'expo-router';
-import { ConnectionType } from '../constants/types';
+import { Connection, ConnectionType } from '../constants/types';
 import { checkLength } from '@/lib/helper';
 
-export const Item = (item: ConnectionType & { isLastItemOnList?: boolean }) => {
+export const Item = (item: Connection & { isLastItemOnList?: boolean }) => {
   const router = useRouter();
 
   const [hours, minutes] = item?.connectedTo?.end.split(':').map(Number);

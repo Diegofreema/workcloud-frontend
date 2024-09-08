@@ -9,7 +9,7 @@ import { useDarkMode } from '@/hooks/useDarkMode';
 export const ProfileHeader = (user: PartialUser): JSX.Element | undefined => {
   const { darkMode } = useDarkMode();
   return (
-    <Link asChild href={`/(app)/(myProfile)/${user?.id}`}>
+    <Link asChild href={`/profile-edit`}>
       <Pressable
         style={{
           marginTop: 10,

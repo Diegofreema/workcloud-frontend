@@ -1,9 +1,9 @@
 import { HStack } from '@gluestack-ui/themed';
-import { StyleSheet, View, Text } from 'react-native';
-import { MyText } from './MyText';
+import { Link } from 'expo-router';
+import { StyleSheet, Text } from 'react-native';
+import { RFValue } from 'react-native-responsive-fontsize';
 import { colors } from '../../constants/Colors';
-import { Link, LinkProps } from 'expo-router';
-
+import { MyText } from './MyText';
 type Props = {
   link: any;
   leftText?: string;
@@ -17,14 +17,14 @@ export const HeadingText = ({
 }: Props): JSX.Element => {
   return (
     <HStack alignItems="center" justifyContent="space-between">
-      <MyText poppins="Bold" style={{ fontSize: 13 }}>
+      <MyText poppins="Bold" style={{ fontSize: RFValue(13) }}>
         {leftText}
       </MyText>
       <Link href={link}>
         <Text
           style={{
             color: colors.dialPad,
-            fontSize: 9,
+            fontSize: RFValue(9),
             fontFamily: 'PoppinsBold',
           }}
         >

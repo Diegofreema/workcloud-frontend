@@ -1,28 +1,25 @@
-import { Redirect, Stack } from 'expo-router';
+import { LoadingComponent } from '@/components/Ui/LoadingComponent';
+import { Redirect, Stack, usePathname } from 'expo-router';
+import { useEffect } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { StreamChat } from 'stream-chat';
 import { Chat, DeepPartial, OverlayProvider, Theme } from 'stream-chat-expo';
-import { useCallback, useEffect } from 'react';
-import { LoadingComponent } from '@/components/Ui/LoadingComponent';
-import { useData } from '@/hooks/useData';
 
-import { useChatClient } from '@/useChatClient';
 import { AppProvider } from '@/AppContext';
 import { useDarkMode } from '@/hooks/useDarkMode';
-import { StatusBar } from '@gluestack-ui/themed';
 import { supabase } from '@/lib/supabase';
-import { useQueryClient } from '@tanstack/react-query';
-import { onRefresh } from '@/lib/helper';
+import { useChatClient } from '@/useChatClient';
+import { useUser } from '@clerk/clerk-expo';
+import { StatusBar } from '@gluestack-ui/themed';
 
 const api = 'cnvc46pm8uq9';
 const client = StreamChat.getInstance('cnvc46pm8uq9');
 
 export default function AppLayout() {
   const { clientIsReady } = useChatClient();
-  const { id, getValues, user } = useData();
+  const { isLoaded, isSignedIn } = useUser();
   const { darkMode } = useDarkMode();
-  const queryClient = useQueryClient();
-
+  const pathname = usePathname();
   useEffect(() => {
     const channel = supabase
       .channel('workcloud')
@@ -33,9 +30,9 @@ export default function AppLayout() {
           schema: 'public',
         },
         (payload) => {
-          if (payload) {
-            onRefresh(id);
-          }
+          // if (payload) {
+          //   onRefresh(id);
+          // }
           console.log('Change received!', payload);
         }
       )
@@ -83,20 +80,13 @@ export default function AppLayout() {
     },
   };
 
-  const getUserStored = useCallback(() => {
-    getValues();
-  }, []);
-
-  useEffect(() => {
-    getUserStored();
-  }, []);
-
-  if (!id || !user?.id) {
-    return <Redirect href={'/'} />;
-  }
-  if (!clientIsReady) {
+  if (!clientIsReady || !isLoaded) {
     return <LoadingComponent />;
   }
+  if (!isSignedIn) {
+    return <Redirect href={'/'} />;
+  }
+
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <StatusBar

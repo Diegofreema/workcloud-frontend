@@ -1,12 +1,11 @@
 import { HStack, VStack } from '@gluestack-ui/themed';
+import { useRouter } from 'expo-router';
 import { Pressable, StyleSheet, View } from 'react-native';
-import { MyText } from '../Ui/MyText';
 import { colors } from '../../constants/Colors';
-import { Link, useRouter } from 'expo-router';
+import { MyText } from '../Ui/MyText';
 
-import { UserPreview } from '../Ui/UserPreview';
-import { useData } from '@/hooks/useData';
 import { useDarkMode } from '@/hooks/useDarkMode';
+import { UserPreview } from '../Ui/UserPreview';
 type Props = {
   id?: string;
   image?: string;
@@ -22,14 +21,19 @@ export const TopCard = ({
   ownedWks,
   assignedWk,
   workspaceId,
+  id,
 }: Props): JSX.Element => {
   const router = useRouter();
-  const { id } = useData();
+
   const { darkMode } = useDarkMode();
   const navigate = () => {
     if (!workspaceId) return;
 
     router.replace(`/wk/${workspaceId}`);
+  };
+
+  const onEditProfile = () => {
+    router.push('/edit-profile');
   };
   return (
     <View style={{ backgroundColor: darkMode === 'dark' ? 'black' : 'white' }}>
@@ -70,19 +74,18 @@ export const TopCard = ({
             </VStack>
           </Pressable>
 
-          <Link href="/edit-profile" asChild>
-            <Pressable
-              style={{
-                backgroundColor: colors.dialPad,
-                padding: 10,
-                borderRadius: 5,
-              }}
-            >
-              <MyText poppins="Medium" fontSize={12} style={{ color: 'white' }}>
-                Edit Profile
-              </MyText>
-            </Pressable>
-          </Link>
+          <Pressable
+            style={{
+              backgroundColor: colors.dialPad,
+              padding: 10,
+              borderRadius: 5,
+            }}
+            onPress={onEditProfile}
+          >
+            <MyText poppins="Medium" fontSize={15} style={{ color: 'white' }}>
+              Edit Profile
+            </MyText>
+          </Pressable>
         </HStack>
       </View>
     </View>

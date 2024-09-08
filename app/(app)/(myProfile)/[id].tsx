@@ -1,25 +1,24 @@
-import { Pressable, View } from 'react-native';
 import React, { useEffect, useState } from 'react';
+import { Pressable, View } from 'react-native';
 import { HeaderNav } from '../../../components/HeaderNav';
-import { defaultStyle } from '../../../constants/index';
-import { TopCard } from '../../../components/LoggedInuser/TopCard';
 import { BottomCard } from '../../../components/LoggedInuser/BottomCard';
 import { MiddleCard } from '../../../components/LoggedInuser/MiddleCard';
+import { TopCard } from '../../../components/LoggedInuser/TopCard';
+import { defaultStyle } from '../../../constants/index';
 
-import { LoadingComponent } from '@/components/Ui/LoadingComponent';
-import { Redirect, useLocalSearchParams } from 'expo-router';
-import { useGetConnection, useProfile } from '@/lib/queries';
 import { ErrorComponent } from '@/components/Ui/ErrorComponent';
-import { useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/lib/supabase';
+import { LoadingComponent } from '@/components/Ui/LoadingComponent';
 import { Profile } from '@/constants/types';
-import { IconButton } from 'react-native-paper';
 import { useDarkMode } from '@/hooks/useDarkMode';
-import { MyText } from '@/components/Ui/MyText';
-import { HStack } from '@gluestack-ui/themed';
+import { useGetConnection } from '@/lib/queries';
+import { supabase } from '@/lib/supabase';
+import { useQueryClient } from '@tanstack/react-query';
+import { useLocalSearchParams } from 'expo-router';
+import { IconButton } from 'react-native-paper';
 
 const MyProfile = () => {
   const { id } = useLocalSearchParams<{ id: string }>();
+  const { darkMode } = useDarkMode();
   const {
     data: connections,
     refetch: refetchConnections,
@@ -29,9 +28,9 @@ const MyProfile = () => {
     isPaused: isConnectionsPaused,
   } = useGetConnection(id);
   const [user, setUser] = useState<Profile | null>();
-  const { darkMode, toggleDarkMode } = useDarkMode();
+
   const [loading, setLoading] = useState(false);
-  console.log('🚀 ~ MyProfile ~ user:', user);
+
   const queryClient = useQueryClient();
 
   useEffect(() => {
@@ -73,7 +72,12 @@ const MyProfile = () => {
   const assignedWk = user?.workerId?.workspaceId ? 1 : 0;
   return (
     <View style={{ flex: 1 }}>
-      <View style={defaultStyle}>
+      <View
+        style={[
+          defaultStyle,
+          { backgroundColor: darkMode === 'dark' ? 'black' : 'white' },
+        ]}
+      >
         <HeaderNav title="Profile" RightComponent={RightComponent} />
       </View>
       <TopCard
@@ -84,9 +88,9 @@ const MyProfile = () => {
         assignedWk={assignedWk}
         workspaceId={user?.workerId?.id}
       />
-      <View style={{ marginTop: 20, ...defaultStyle }}>
+      {/* <View style={{ marginTop: 20, ...defaultStyle }}>
         <MiddleCard connections={connections?.connections} />
-      </View>
+      </View> */}
       <View style={{ marginTop: 'auto', ...defaultStyle, marginBottom: 15 }}>
         <BottomCard workId={user?.workerId?.id} />
       </View>

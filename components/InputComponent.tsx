@@ -61,6 +61,8 @@ export const InputComponent = ({
         placeholder={placeholder}
         containerStyle={{
           justifyContent: 'center',
+
+          height: 40,
         }}
         inputContainerStyle={{
           borderBottomColor: 'transparent',
