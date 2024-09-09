@@ -29,7 +29,7 @@ export const createOrg = async (orgData: Org) => {
 export const createToken = async (userId: string) => {
   try {
     const { data: axiosData } = await axios.post(
-      'http://localhost:8989/create-token',
+      'http://192.168.154.144:8989/create-token',
       {
         id: userId,
       }
@@ -37,7 +37,7 @@ export const createToken = async (userId: string) => {
 
     return axiosData.streamToken;
   } catch (error) {
-    console.log(error);
+    console.log(JSON.stringify(error, null, 1));
   }
 };
 export const checkIfUserExistsFn = async (email: string) => {

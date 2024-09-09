@@ -1,19 +1,18 @@
-import { FlatList, StyleSheet, Text, View } from 'react-native';
-import React from 'react';
-import { Container } from '@/components/Ui/Container';
+import { EmptyText } from '@/components/EmptyText';
 import { HeaderNav } from '@/components/HeaderNav';
-import { usePendingWorkers } from '@/lib/queries';
+import { Container } from '@/components/Ui/Container';
 import { ErrorComponent } from '@/components/Ui/ErrorComponent';
 import { LoadingComponent } from '@/components/Ui/LoadingComponent';
 import { UserPreview } from '@/components/Ui/UserPreview';
-import { MyText } from '@/components/Ui/MyText';
-import { EmptyText } from '@/components/EmptyText';
-import { useData } from '@/hooks/useData';
+import { usePendingWorkers } from '@/lib/queries';
+import { useAuth } from '@clerk/clerk-expo';
+import React from 'react';
+import { FlatList, StyleSheet, View } from 'react-native';
 
 type Props = {};
 
 const PendingStaffs = (props: Props) => {
-  const { id } = useData();
+  const { userId: id } = useAuth();
   const {
     data,
     isPaused,
@@ -23,7 +22,7 @@ const PendingStaffs = (props: Props) => {
     isRefetching,
     isRefetchError,
   } = usePendingWorkers(id);
-  console.log('🚀 ~ PendingStaffs ~ data:', data?.requests);
+
   if (isError || isRefetchError || isPaused || data?.error) {
     return <ErrorComponent refetch={refetch} />;
   }

@@ -17,6 +17,8 @@ const client = StreamChat.getInstance('cnvc46pm8uq9');
 
 export default function AppLayout() {
   const { clientIsReady } = useChatClient();
+  console.log(clientIsReady, 'clientIsReady');
+
   const { isLoaded, isSignedIn } = useUser();
   const { darkMode } = useDarkMode();
   const pathname = usePathname();
@@ -81,11 +83,10 @@ export default function AppLayout() {
       },
     },
   };
-
-  if (!clientIsReady || !isLoaded) {
+  if (!clientIsReady) {
     return <LoadingComponent />;
   }
-  if (!isSignedIn) {
+  if (isLoaded && !isSignedIn) {
     return <Redirect href={'/'} />;
   }
 

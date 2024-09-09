@@ -212,6 +212,7 @@ export const ProfileUpdateForm = ({
               label="First Name"
               onChangeText={handleChange('firstName')}
               placeholder="First Name"
+              autoCapitalize="sentences"
               value={values.firstName}
             />
             {touched.firstName && errors.firstName && (
@@ -226,6 +227,7 @@ export const ProfileUpdateForm = ({
               onChangeText={handleChange('lastName')}
               placeholder="Last Name"
               value={values.lastName}
+              autoCapitalize="sentences"
             />
             {touched.lastName && errors.lastName && (
               <MyText poppins="Medium" style={styles.error}>

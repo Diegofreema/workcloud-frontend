@@ -923,12 +923,12 @@
   dependencies:
     csstype "3.1.1"
 
-"@config-plugins/react-native-webrtc@^8.0.0":
-  version "8.0.0"
-  resolved "https://registry.yarnpkg.com/@config-plugins/react-native-webrtc/-/react-native-webrtc-8.0.0.tgz#4a4ec35d83ab221d6b1f2476daf331df50ee77d5"
-  integrity sha512-eDMsuBW9pZh7gLR7YQOvA3FqvILjO+pjveIh7JpF1WJqBUFF+KV2zYrxRowEyd2GI/YANaQNj4eWGApVFaziTQ==
+"@config-plugins/react-native-webrtc@^9.0.0":
+  version "9.0.0"
+  resolved "https://registry.yarnpkg.com/@config-plugins/react-native-webrtc/-/react-native-webrtc-9.0.0.tgz#9b88921a5e5f36da628a9eea609ba88836248be1"
+  integrity sha512-XHqEIR3iejek1YGZT5441j7i7LI1YdI4yM7nP4PMgswT/hzBnII4Ra9uiIaG105dmqioYgkn2TcScqyOf2MCtQ==
   dependencies:
-    expo-build-properties "~0.11.0"
+    expo-build-properties "~0.12.1"
 
 "@dev-plugins/react-navigation@^0.0.5":
   version "0.0.5"
@@ -1894,10 +1894,10 @@
   dependencies:
     "@react-native-aria/focus" "^0.2.9"
 
-"@gorhom/bottom-sheet@4.4.8":
-  version "4.4.8"
-  resolved "https://registry.yarnpkg.com/@gorhom/bottom-sheet/-/bottom-sheet-4.4.8.tgz#cfc1b342e9151acecbb846bd67638211382a350e"
-  integrity sha512-5QgM91NJjbqKxI8RjZ9ujjynaPzAM1iQKExK3+L+ZbEnziIq8tgOekhiBUut9sBZAQA4nhLxWV6Rt/HGpgCldQ==
+"@gorhom/bottom-sheet@^4.6.4":
+  version "4.6.4"
+  resolved "https://registry.yarnpkg.com/@gorhom/bottom-sheet/-/bottom-sheet-4.6.4.tgz#387d0f0f21e3470eb8575498cb81ce96f5108e79"
+  integrity sha512-0itLMblLBvepE065w3a60S030c2rNUsGshPC7wbWDm31VyqoaU2xjzh/ojH62YIJOcobBr5QoC30IxBBKDGovQ==
   dependencies:
     "@gorhom/portal" "1.0.14"
     invariant "^2.2.4"
@@ -2297,19 +2297,19 @@
   resolved "https://registry.yarnpkg.com/@pkgjs/parseargs/-/parseargs-0.11.0.tgz#a77ea742fab25775145434eb1d2328cf5013ac33"
   integrity sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==
 
-"@protobuf-ts/runtime-rpc@^2.9.3", "@protobuf-ts/runtime-rpc@^2.9.4":
+"@protobuf-ts/runtime-rpc@^2.9.4":
   version "2.9.4"
   resolved "https://registry.yarnpkg.com/@protobuf-ts/runtime-rpc/-/runtime-rpc-2.9.4.tgz#d6ab2316c0ba67ce5a08863bb23203a837ff2a3b"
   integrity sha512-y9L9JgnZxXFqH5vD4d7j9duWvIJ7AShyBRoNKJGhu9Q27qIbchfzli66H9RvrQNIFk5ER7z1Twe059WZGqERcA==
   dependencies:
     "@protobuf-ts/runtime" "^2.9.4"
 
-"@protobuf-ts/runtime@^2.9.3", "@protobuf-ts/runtime@^2.9.4":
+"@protobuf-ts/runtime@^2.9.4":
   version "2.9.4"
   resolved "https://registry.yarnpkg.com/@protobuf-ts/runtime/-/runtime-2.9.4.tgz#db8a78b1c409e26d258ca39464f4757d804add8f"
   integrity sha512-vHRFWtJJB/SiogWDF0ypoKfRIZ41Kq+G9cEFj6Qm1eQaAhJ1LDFvgZ7Ja4tb3iLOQhz0PaoPnnOijF1qmEqTxg==
 
-"@protobuf-ts/twirp-transport@^2.9.3":
+"@protobuf-ts/twirp-transport@^2.9.4":
   version "2.9.4"
   resolved "https://registry.yarnpkg.com/@protobuf-ts/twirp-transport/-/twirp-transport-2.9.4.tgz#5e98808800c3fb3546d0d59c9c84f6a1111cca9b"
   integrity sha512-hoLHHVn1GgLyRVxDW9f0QKG24u/T/hLC0D97cV18OLyeC6Ibsvfg6xSSgA9Q/9wtBPI9ntMU/5/XLpICUXDgDQ==
@@ -3619,7 +3619,7 @@
   resolved "https://registry.yarnpkg.com/@stream-io/flat-list-mvcp/-/flat-list-mvcp-0.10.3.tgz#774e56aba7f3da5a8f2ae5ad3065f05e5a27e7f2"
   integrity sha512-2ZK8piYlEfKIPZrH8BpZz9uj8HZcUvMCV0X7qSLSAc/vhLOANBfR0SSn0OaWPbqb2mFGAd4FxmLSPp1zKEYuaw==
 
-"@stream-io/react-native-webrtc@^118.0.1":
+"@stream-io/react-native-webrtc@^118.1.0":
   version "118.1.0"
   resolved "https://registry.yarnpkg.com/@stream-io/react-native-webrtc/-/react-native-webrtc-118.1.0.tgz#f3c9baa5e173c2cde435bf98f906fa65df1e3d12"
   integrity sha512-XUtJ/PWGti01uQc1XvGXha2zeYhuqhipGs6j8nQXRxx+CBgGW7xdM7F7XUtkKL3QbAUvqJFjHuBzFdNiLIWzdQ==
@@ -3628,40 +3628,39 @@
     debug "4.3.4"
     event-target-shim "6.0.2"
 
-"@stream-io/video-client@^0.6.10":
-  version "0.6.10"
-  resolved "https://registry.yarnpkg.com/@stream-io/video-client/-/video-client-0.6.10.tgz#b30ca45ea713a10e6aafa6fbbe8885c40108b00a"
-  integrity sha512-0JbwGYwxcu/du7IKyZScpym7O/KZbp+Z9jhF87k06vCP2pCC29UA9uuSuI6SgdsXYGI6DEQRsiWo5zL/6PzvEg==
+"@stream-io/video-client@1.6.1":
+  version "1.6.1"
+  resolved "https://registry.yarnpkg.com/@stream-io/video-client/-/video-client-1.6.1.tgz#629667ac55db2eac5c7a8feb1208ce63e7d71d63"
+  integrity sha512-Fg4LwNuyxc9CjZiGAgiFTP4zOcvPKgXQpVEIz9BK0e1twqx2vwLv6VKDggagNMO7uIZxfpCUN+oyk26DWWsVWA==
   dependencies:
-    "@protobuf-ts/runtime" "^2.9.3"
-    "@protobuf-ts/runtime-rpc" "^2.9.3"
-    "@protobuf-ts/twirp-transport" "^2.9.3"
+    "@protobuf-ts/runtime" "^2.9.4"
+    "@protobuf-ts/runtime-rpc" "^2.9.4"
+    "@protobuf-ts/twirp-transport" "^2.9.4"
     "@types/ws" "^8.5.7"
     axios "^1.6.0"
     base64-js "^1.5.1"
     isomorphic-ws "^5.0.0"
-    jsonwebtoken "^9.0.2"
     rxjs "~7.8.1"
     sdp-transform "^2.14.1"
     ua-parser-js "^1.0.36"
     webrtc-adapter "^8.2.3"
     ws "^8.14.2"
 
-"@stream-io/video-react-bindings@^0.4.10":
-  version "0.4.53"
-  resolved "https://registry.yarnpkg.com/@stream-io/video-react-bindings/-/video-react-bindings-0.4.53.tgz#a008546e2b3cadab98f1a416aef755f14bd9cf8b"
-  integrity sha512-1FvSuhRhY2Wll/jvAxSJvFduscb/+3wIGfxOZvK+5cXfqlUmiPxXukBhZ1b1iIGi/Rl0TuBnCYCgX85qBBAUfA==
+"@stream-io/video-react-bindings@1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@stream-io/video-react-bindings/-/video-react-bindings-1.0.1.tgz#101a0ebb9c771c4a922fbddcbf3743a475612ccc"
+  integrity sha512-KLGfz98xqex28OWRehBdmgR2QL6OlhyoKB4wxqukalp6lZKxXSPEnYNPG3Z8eNNmv9LTCLSKizrX3Ws5vc5Mfw==
   dependencies:
     i18next "^23.5.1"
     rxjs "~7.8.1"
 
-"@stream-io/video-react-native-sdk@^0.5.7":
-  version "0.5.17"
-  resolved "https://registry.yarnpkg.com/@stream-io/video-react-native-sdk/-/video-react-native-sdk-0.5.17.tgz#2b385d73fe1f7ab8c6349869bd4340e6eb56cbd5"
-  integrity sha512-NeGtr/mVtkc454XdFQe8gZOKTtmJ+k/bs8HTwvFSiTSX+XGga2pxsWpglTzRGPINyRf5Owh8+Ml91rjT+d7XDw==
+"@stream-io/video-react-native-sdk@^1.0.3":
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/@stream-io/video-react-native-sdk/-/video-react-native-sdk-1.0.3.tgz#e4908513ea7b89fa973f061f2c3d8c949b0e4faf"
+  integrity sha512-1kgMVdIJlaeN9w/b+BchxwcBkgLWlBgjp46ra22d7J9/qZbw7xO5rivVQ9JvNy+cYkLmy1gz7KQeCdE4BDiqxw==
   dependencies:
-    "@stream-io/video-client" "^0.6.10"
-    "@stream-io/video-react-bindings" "^0.4.10"
+    "@stream-io/video-client" "1.6.1"
+    "@stream-io/video-react-bindings" "1.0.1"
     intl-pluralrules "2.0.1"
     lodash.merge "^4.6.2"
     react-native-url-polyfill "1.3.0"
@@ -5816,13 +5815,13 @@ expo-av@~14.0.7:
   resolved "https://registry.yarnpkg.com/expo-av/-/expo-av-14.0.7.tgz#deb967325e58b2c4d408f5d76a7ccb269442cba1"
   integrity sha512-FvKZxyy+2/qcCmp+e1GTK3s4zH8ZO1RfjpqNxh7ARlS1oH8HPtk1AyZAMo52tHz3yQ3UIqxQ2YbI9CFb4065lA==
 
-expo-build-properties@~0.11.0:
-  version "0.11.1"
-  resolved "https://registry.yarnpkg.com/expo-build-properties/-/expo-build-properties-0.11.1.tgz#dc9ab9fb1ac989b97da500b3ec75139c961d8b26"
-  integrity sha512-m4j4aEjFaDuBE6KWYMxDhWgLzzSmpE7uHKAwtvXyNmRK+6JKF0gjiXi0sXgI5ngNppDQpsyPFMvqG7uQpRuCuw==
+expo-build-properties@~0.12.1:
+  version "0.12.5"
+  resolved "https://registry.yarnpkg.com/expo-build-properties/-/expo-build-properties-0.12.5.tgz#4d6232389f00c846ba37ca5df2c0b5527c2d94ca"
+  integrity sha512-donC1le0PYfLKCPKRMGQoixuWuwDWCngzXSoQXUPsgHTDHQUKr8aw+lcWkTwZcItgNovcnk784I0dyfYDcxybA==
   dependencies:
     ajv "^8.11.0"
-    semver "^7.5.3"
+    semver "^7.6.0"
 
 expo-clipboard@~6.0.3:
   version "6.0.3"
@@ -7812,7 +7811,7 @@ jsonfile@^6.0.1:
   optionalDependencies:
     graceful-fs "^4.1.6"
 
-jsonwebtoken@^9.0.2, jsonwebtoken@~9.0.0:
+jsonwebtoken@~9.0.0:
   version "9.0.2"
   resolved "https://registry.yarnpkg.com/jsonwebtoken/-/jsonwebtoken-9.0.2.tgz#65ff91f4abef1784697d40952bb1998c504caaf3"
   integrity sha512-PRp66vJ865SSqOlgqS8hujT5U4AOgMfhrwYIuIhfKaoSCZcirrmASQr8CX7cUg+RMih+hgznrjp99o+W4pJLHQ==
@@ -10208,19 +10207,19 @@ stream-buffers@2.2.x, stream-buffers@~2.2.0:
   resolved "https://registry.yarnpkg.com/stream-buffers/-/stream-buffers-2.2.0.tgz#91d5f5130d1cef96dcfa7f726945188741d09ee4"
   integrity sha512-uyQK/mx5QjHun80FLJTfaWE7JtwfRMKBLkMne6udYOmvH0CawotVa7TfgYHzAnpphn4+TweIx1QKMnRIbipmUg==
 
-stream-chat-expo@^5.25.0:
-  version "5.35.0"
-  resolved "https://registry.yarnpkg.com/stream-chat-expo/-/stream-chat-expo-5.35.0.tgz#9b0c0f5cd32895cf7d8d45e13a6b3e751c3df405"
-  integrity sha512-qowq9iP20IQsdhLCVxtmwiOW0Dn8FVAQDUeQUap43oSzYOVjOgy4lyxKfq2dHu4HkUJ1LBNmd0t3w5JSSkbY8A==
+stream-chat-expo@^5.36.1:
+  version "5.36.1"
+  resolved "https://registry.yarnpkg.com/stream-chat-expo/-/stream-chat-expo-5.36.1.tgz#63b3dacd7bf3db98f2a43244f3c3c4c718e2b896"
+  integrity sha512-ZqP4LPqK4tABRnSPGkgcfOk1E6G3VDVUeMiK26cNroM6F2IhQfowOgkOMkOd1K38q1ZkeMGXrS7Mn2mPmvmccQ==
   dependencies:
-    stream-chat-react-native-core "5.35.0"
+    stream-chat-react-native-core "5.36.1"
 
-stream-chat-react-native-core@5.35.0:
-  version "5.35.0"
-  resolved "https://registry.yarnpkg.com/stream-chat-react-native-core/-/stream-chat-react-native-core-5.35.0.tgz#fe12428400edf715e2ff9ef567b1233d35b9d357"
-  integrity sha512-botPziAoRY7SE/XdLECCKdYAcYiRuQFj0IeUWj2HNkEwCU0bpjQT9y+wpHKC0gKX57VUksPJsoV9ZBQT0KclTQ==
+stream-chat-react-native-core@5.36.1:
+  version "5.36.1"
+  resolved "https://registry.yarnpkg.com/stream-chat-react-native-core/-/stream-chat-react-native-core-5.36.1.tgz#4d3fd3354916a783b77a37c684dd8c126dfd7e10"
+  integrity sha512-5r2zIOsKE+jXkId/V0BnnO/6HY0/HSjjhS1gDrij1vTGBiTXijlDu0SD+L0fNpEsy7k5qoJMSXoyRZKlrEAAZQ==
   dependencies:
-    "@gorhom/bottom-sheet" "4.4.8"
+    "@gorhom/bottom-sheet" "^4.6.4"
     dayjs "1.10.5"
     emoji-regex "^10.3.0"
     i18next "^21.6.14"
@@ -10231,12 +10230,12 @@ stream-chat-react-native-core@5.35.0:
     path "0.12.7"
     react-native-markdown-package "1.8.2"
     react-native-url-polyfill "^1.3.0"
-    stream-chat "8.31.0"
+    stream-chat "8.38.0"
 
-stream-chat@8.31.0:
-  version "8.31.0"
-  resolved "https://registry.yarnpkg.com/stream-chat/-/stream-chat-8.31.0.tgz#387ed3109ac930e222bf260d98afc37dd1fcb1ac"
-  integrity sha512-lORUtfDYljoAgRv7QHUADH1QTGydSWo+U8KmUKwv7BZyUZ2JGwh6VZbu9WL4Nmo7PDU7N/Ug0Q5PE59S6WE+OA==
+stream-chat@8.38.0:
+  version "8.38.0"
+  resolved "https://registry.yarnpkg.com/stream-chat/-/stream-chat-8.38.0.tgz#b7a82faf7734d010a5797ecb2420cc5ea8a40f7c"
+  integrity sha512-hhnbKaH1aqYYySN8+YX8kIyDqcsNhAxQEMxCmhIIBA8i8FSK6/X4dYe/Z0VHlwxUQAf95si5iR1jZCOeAiiOiw==
   dependencies:
     "@babel/runtime" "^7.16.3"
     "@types/jsonwebtoken" "~9.0.0"

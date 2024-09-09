@@ -188,6 +188,8 @@ export type Requests = {
   pending: boolean;
   workspaceId: string | number;
   qualities: string;
+  accepted: boolean;
+  unread: boolean;
 };
 
 export type WK = {

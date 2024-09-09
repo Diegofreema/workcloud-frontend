@@ -10,43 +10,48 @@ export const useAuth = () => {
   return useQuery<UserProfile | null>({
     queryKey: ['profile', user],
     queryFn: async () => {
-      const checkIfUserExists = await checkIfUserExistsFn(
-        user?.emailAddresses[0]?.emailAddress!
-      );
-      if (checkIfUserExists) {
-        getUser({
-          avatar: checkIfUserExists.avatar!,
-          email: checkIfUserExists.email!,
-          id: checkIfUserExists.userId!,
-          name: checkIfUserExists.name!,
-          streamToken: checkIfUserExists.streamToken!,
-        });
-        return checkIfUserExists;
-      } else {
-        const token = await createToken(user?.id!);
-        if (!token) {
-          console.log('failed to create token');
-
-          throw new Error('Failed to create token');
-        }
-        const newUser = await createUser({
-          streamToken: token,
-          email: user?.emailAddresses[0]?.emailAddress!,
-          name: user?.firstName || '' + user?.lastName || '',
-          phoneNumber: user?.phoneNumbers[0]?.phoneNumber!,
-          avatar: user?.imageUrl || '',
-          userId: user?.id!,
-        });
-        if (newUser) {
+      try {
+        const checkIfUserExists = await checkIfUserExistsFn(
+          user?.emailAddresses[0]?.emailAddress!
+        );
+        if (checkIfUserExists) {
           getUser({
-            avatar: newUser.avatar!,
-            email: newUser.email!,
-            id: newUser.userId!,
-            name: newUser.name!,
-            streamToken: newUser.streamToken!,
+            avatar: checkIfUserExists.avatar!,
+            email: checkIfUserExists.email!,
+            id: checkIfUserExists.userId!,
+            name: checkIfUserExists.name!,
+            streamToken: checkIfUserExists.streamToken!,
           });
+          return checkIfUserExists;
+        } else {
+          const token = await createToken(user?.id!);
+          if (!token) {
+            console.log('failed to create token');
+
+            throw new Error('Failed to create token');
+          }
+          const newUser = await createUser({
+            streamToken: token,
+            email: user?.emailAddresses[0]?.emailAddress!,
+            name: user?.firstName || '' + user?.lastName || '',
+            phoneNumber: user?.phoneNumbers[0]?.phoneNumber!,
+            avatar: user?.imageUrl || '',
+            userId: user?.id!,
+          });
+          if (newUser) {
+            getUser({
+              avatar: newUser.avatar!,
+              email: newUser.email!,
+              id: newUser.userId!,
+              name: newUser.name!,
+              streamToken: newUser.streamToken!,
+            });
+          }
+          return newUser;
         }
-        return newUser;
+      } catch (error) {
+        console.log(JSON.stringify(error, null, 1));
+        throw Error('Failed to get user');
       }
     },
     retry: 5,

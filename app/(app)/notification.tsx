@@ -1,5 +1,5 @@
 import { FlatList } from 'react-native';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { usePendingRequest } from '@/lib/queries';
 import { useData } from '@/hooks/useData';
 import { ErrorComponent } from '@/components/Ui/ErrorComponent';
@@ -16,14 +16,16 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useInfos } from '@/hooks/useGetInfo';
 import { supabase } from '@/lib/supabase';
 import Toast from 'react-native-toast-message';
+import { useAuth } from '@clerk/clerk-expo';
 
 type Props = {};
 
 const Notification = (props: Props) => {
-  const { user, id } = useData();
+  const { userId: id } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const queryClient = useQueryClient();
   const { infoIds, removeInfoIds } = useInfos();
+
   const {
     data,
     isPaused,
@@ -33,7 +35,26 @@ const Notification = (props: Props) => {
     isRefetching,
     isRefetchError,
   } = usePendingRequest(id);
-  console.log(data?.error);
+
+  useEffect(() => {
+    if (data) {
+      const markAllAsRead = async () => {
+        try {
+          data.requests.forEach(async (request) => {
+            if (request.unread) {
+              const { error } = await supabase
+                .from('request')
+                .update({ unread: false })
+                .eq('id', request.id);
+            }
+          });
+        } catch (error) {
+          console.log(error);
+        }
+      };
+      markAllAsRead();
+    }
+  }, [data]);
 
   if (isError || isRefetchError || isPaused || data?.error) {
     return <ErrorComponent refetch={refetch} />;
@@ -44,10 +65,6 @@ const Notification = (props: Props) => {
   }
   // 6602c083d9c51008cb52b02c
   const { requests } = data;
-  const handleTest = async () => {
-    const data = await checkIfEmployed(id);
-    console.log(data);
-  };
 
   const onPress = async () => {
     setIsLoading(true);
@@ -60,7 +77,7 @@ const Notification = (props: Props) => {
         signedIn: false,
         leisure: false,
       })
-      .eq('id', id);
+      .eq('id', id!);
     if (!error) {
     }
 
@@ -122,7 +139,7 @@ const Notification = (props: Props) => {
       />
       <Container>
         <HeaderNav title="Notifications" />
-        <MyButton onPress={handleTest}>Test</MyButton>
+
         <FlatList
           style={{ marginTop: 10 }}
           ListEmptyComponent={() => (

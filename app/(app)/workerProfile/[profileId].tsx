@@ -27,13 +27,14 @@ import { useDetailsToAdd } from '@/hooks/useDetailsToAdd';
 import { Button } from '@rneui/themed';
 import { Container } from '@/components/Ui/Container';
 import { useDarkMode } from '@/hooks/useDarkMode';
+import { useUser } from '@clerk/clerk-expo';
 type Props = {};
 
 const Profile = (props: Props) => {
   const { profileId } = useLocalSearchParams<{ profileId: string }>();
   // console.log('🚀 ~ Profile ~ profileId:', profileId);
   const { client } = useChatContext();
-  const { user, id } = useData();
+  const { user } = useUser();
   const { darkMode } = useDarkMode();
   const [cancelling, setCancelling] = useState(false);
   const [isInPending, setIsInPending] = useState(false);
@@ -57,7 +58,7 @@ const Profile = (props: Props) => {
     isRefetching: isRefetchingData,
     isRefetchError: isRefetchErrorData,
     error,
-  } = useGetRequests(id, profileId);
+  } = useGetRequests(user?.id as string, profileId);
   console.log(pendingData, 'Pending Data');
 
   const queryClient = useQueryClient();
@@ -79,14 +80,13 @@ const Profile = (props: Props) => {
   if (isPending || isPendingData) {
     return <LoadingComponent />;
   }
+  console.log(user?.id, profileId);
 
   const startChannel = async () => {
     const channel = client.channel('messaging', {
       members: [user?.id as string, profileId],
     });
-
     await channel.watch();
-
     router.push(`/chat/${channel.id}`);
   };
 
@@ -114,7 +114,7 @@ const Profile = (props: Props) => {
           text1: 'Request Canceled',
         });
         queryClient.invalidateQueries({
-          queryKey: ['request', id, profileId],
+          queryKey: ['request'],
         });
       }
 
@@ -162,7 +162,7 @@ const Profile = (props: Props) => {
         </View>
 
         <HStack gap={20} mt={20}>
-          {worker?.bossId !== id && (
+          {worker?.bossId !== user?.id && (
             <Button
               onPress={handleRequest}
               loading={cancelling}

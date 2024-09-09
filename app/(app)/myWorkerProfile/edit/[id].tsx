@@ -24,6 +24,7 @@ import { ErrorComponent } from '@/components/Ui/ErrorComponent';
 import { LoadingComponent } from '@/components/Ui/LoadingComponent';
 import { supabase } from '@/lib/supabase';
 import { Container } from '@/components/Ui/Container';
+import { useAuth, useUser } from '@clerk/clerk-expo';
 type Props = {};
 const validationSchema = yup.object().shape({
   gender: yup.string().required('Gender is required'),
@@ -53,7 +54,7 @@ const genders = [
 const CreateProfile = (props: Props) => {
   const { darkMode } = useDarkMode();
 
-  const { user, id } = useData();
+  const { user } = useUser();
   const {
     data,
     isPaused,
@@ -62,7 +63,7 @@ const CreateProfile = (props: Props) => {
     refetch,
     isRefetching,
     isRefetchError,
-  } = useGetWorkerProfile(id);
+  } = useGetWorkerProfile(user?.id);
   const queryClient = useQueryClient();
   const router = useRouter();
 
@@ -98,11 +99,11 @@ const CreateProfile = (props: Props) => {
             gender,
             qualifications,
           })
-          .eq('userId', id);
+          .eq('userId', user?.id!);
         Toast.show({
           type: 'success',
           text1: 'Success',
-          text2: `${user?.name} your work profile has been updated`,
+          text2: `${user?.firstName} your work profile has been updated`,
         });
         queryClient.invalidateQueries({ queryKey: ['worker'] });
         if (error) {
@@ -179,7 +180,9 @@ const CreateProfile = (props: Props) => {
                 placeholder="Write about your past work experience..."
                 keyboardType="default"
                 numberOfLines={5}
+                textAlignVertical="top"
                 multiline
+                autoCapitalize="sentences"
               />
               <MyText poppins="Medium" fontSize={15}>
                 {experience.length}/{max}
@@ -199,6 +202,7 @@ const CreateProfile = (props: Props) => {
                 keyboardType="default"
                 numberOfLines={5}
                 multiline
+                autoCapitalize="sentences"
               />
 
               {touched.qualifications && errors.qualifications && (
@@ -216,6 +220,7 @@ const CreateProfile = (props: Props) => {
                 keyboardType="default"
                 numberOfLines={5}
                 multiline
+                autoCapitalize="sentences"
               />
               {touched.skills && errors.skills && (
                 <Text style={{ color: 'red', fontWeight: 'bold' }}>
@@ -232,6 +237,7 @@ const CreateProfile = (props: Props) => {
                 keyboardType="default"
                 numberOfLines={5}
                 multiline
+                autoCapitalize="sentences"
               />
               {touched.location && errors.location && (
                 <Text style={{ color: 'red', fontWeight: 'bold' }}>
@@ -261,6 +267,10 @@ const CreateProfile = (props: Props) => {
                 fontFamily="PoppinsMedium"
                 setSelected={handleChange('gender')}
                 data={genders}
+                defaultOption={{
+                  key: gender,
+                  value: gender,
+                }}
                 save="value"
                 placeholder="Select your a gender"
               />
@@ -279,6 +289,7 @@ const CreateProfile = (props: Props) => {
               onPress={() => handleSubmit()}
               buttonColor={colors.buttonBlue}
               textColor="white"
+              contentStyle={{ height: 50 }}
             >
               {isSubmitting ? 'Submitting...' : 'Submit'}
             </Button>

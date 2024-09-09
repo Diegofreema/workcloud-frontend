@@ -37,7 +37,7 @@ export type Database = {
             referencedColumns: ['id'];
           },
           {
-            foreignKeyName: 'public_connections_owner_fkey';
+            foreignKeyName: 'connections_owner_fkey';
             columns: ['owner'];
             isOneToOne: false;
             referencedRelation: 'user';
@@ -144,7 +144,7 @@ export type Database = {
         };
         Relationships: [
           {
-            foreignKeyName: 'public_organization_ownerId_fkey';
+            foreignKeyName: 'organization_ownerId_fkey';
             columns: ['ownerId'];
             isOneToOne: false;
             referencedRelation: 'user';
@@ -270,6 +270,7 @@ export type Database = {
       };
       request: {
         Row: {
+          accepted: boolean | null;
           created_at: string;
           from: string | null;
           id: number;
@@ -280,9 +281,11 @@ export type Database = {
           role: string;
           salary: string;
           to: string | null;
+          unread: boolean | null;
           workspaceId: number | null;
         };
         Insert: {
+          accepted?: boolean | null;
           created_at?: string;
           from?: string | null;
           id?: number;
@@ -293,9 +296,11 @@ export type Database = {
           role: string;
           salary: string;
           to?: string | null;
+          unread?: boolean | null;
           workspaceId?: number | null;
         };
         Update: {
+          accepted?: boolean | null;
           created_at?: string;
           from?: string | null;
           id?: number;
@@ -306,16 +311,10 @@ export type Database = {
           role?: string;
           salary?: string;
           to?: string | null;
+          unread?: boolean | null;
           workspaceId?: number | null;
         };
         Relationships: [
-          {
-            foreignKeyName: 'public_request_from_fkey';
-            columns: ['from'];
-            isOneToOne: false;
-            referencedRelation: 'user';
-            referencedColumns: ['userId'];
-          },
           {
             foreignKeyName: 'public_request_organizationId_fkey';
             columns: ['organizationId'];
@@ -324,7 +323,14 @@ export type Database = {
             referencedColumns: ['id'];
           },
           {
-            foreignKeyName: 'public_request_to_fkey';
+            foreignKeyName: 'request_from_fkey';
+            columns: ['from'];
+            isOneToOne: false;
+            referencedRelation: 'user';
+            referencedColumns: ['userId'];
+          },
+          {
+            foreignKeyName: 'request_to_fkey';
             columns: ['to'];
             isOneToOne: false;
             referencedRelation: 'user';
@@ -441,17 +447,17 @@ export type Database = {
         };
         Relationships: [
           {
-            foreignKeyName: 'public_user_workerId_fkey';
-            columns: ['workerId'];
-            isOneToOne: false;
-            referencedRelation: 'worker';
-            referencedColumns: ['id'];
-          },
-          {
             foreignKeyName: 'user_organizationId_fkey';
             columns: ['organizationId'];
             isOneToOne: false;
             referencedRelation: 'organization';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'user_workerId_fkey';
+            columns: ['workerId'];
+            isOneToOne: false;
+            referencedRelation: 'worker';
             referencedColumns: ['id'];
           }
         ];
@@ -477,7 +483,7 @@ export type Database = {
         };
         Relationships: [
           {
-            foreignKeyName: 'public_waitList_customer_fkey';
+            foreignKeyName: 'waitList_customer_fkey';
             columns: ['customer'];
             isOneToOne: false;
             referencedRelation: 'user';
@@ -536,32 +542,18 @@ export type Database = {
         };
         Relationships: [
           {
-            foreignKeyName: 'public_worker_bossId_fkey';
-            columns: ['bossId'];
-            isOneToOne: false;
-            referencedRelation: 'user';
-            referencedColumns: ['userId'];
-          },
-          {
-            foreignKeyName: 'public_worker_servicePointId_fkey';
-            columns: ['servicePointId'];
-            isOneToOne: false;
-            referencedRelation: 'servicePoint';
-            referencedColumns: ['id'];
-          },
-          {
-            foreignKeyName: 'public_worker_userId_fkey';
-            columns: ['userId'];
-            isOneToOne: false;
-            referencedRelation: 'user';
-            referencedColumns: ['userId'];
-          },
-          {
             foreignKeyName: 'public_worker_workspaceId_fkey';
             columns: ['workspaceId'];
             isOneToOne: false;
             referencedRelation: 'workspace';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'worker_bossId_fkey';
+            columns: ['bossId'];
+            isOneToOne: false;
+            referencedRelation: 'user';
+            referencedColumns: ['userId'];
           },
           {
             foreignKeyName: 'worker_organizationId_fkey';
@@ -576,6 +568,20 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'personal';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'worker_servicePointId_fkey';
+            columns: ['servicePointId'];
+            isOneToOne: false;
+            referencedRelation: 'servicePoint';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'worker_userId_fkey';
+            columns: ['userId'];
+            isOneToOne: false;
+            referencedRelation: 'user';
+            referencedColumns: ['userId'];
           }
         ];
       };
@@ -627,13 +633,6 @@ export type Database = {
         };
         Relationships: [
           {
-            foreignKeyName: 'public_workspace_workerId_fkey';
-            columns: ['workerId'];
-            isOneToOne: false;
-            referencedRelation: 'user';
-            referencedColumns: ['userId'];
-          },
-          {
             foreignKeyName: 'workspace_organizationId_fkey';
             columns: ['organizationId'];
             isOneToOne: false;
@@ -646,6 +645,13 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'user';
             referencedColumns: ['userId'];
+          },
+          {
+            foreignKeyName: 'workspace_workerId_fkey';
+            columns: ['workerId'];
+            isOneToOne: false;
+            referencedRelation: 'user';
+            referencedColumns: ['userId'];
           }
         ];
       };
@@ -654,7 +660,10 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
-      [_ in never]: never;
+      requesting_user_id: {
+        Args: Record<PropertyKey, never>;
+        Returns: string;
+      };
     };
     Enums: {
       [_ in never]: never;

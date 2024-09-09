@@ -26,7 +26,7 @@ export default function SignInScreen() {
 
   const { signUp, setActive, isLoaded } = useSignUp();
   const { signIn } = useSignIn();
-
+  const { width } = useWindowDimensions();
   const { startOAuthFlow } = useOAuth({ strategy: 'oauth_google' });
   const router = useRouter();
 
@@ -96,7 +96,7 @@ export default function SignInScreen() {
         <View
           style={{
             width: '100%',
-            marginHorizontal: 10,
+
             alignItems: 'center',
             flex: 1,
           }}
@@ -105,7 +105,7 @@ export default function SignInScreen() {
             source={require('@/assets/images/d.png')}
             style={{
               height: '100%',
-              width: '80%',
+              width: width * 0.9,
               resizeMode: 'contain',
               marginTop: 20,
             }}

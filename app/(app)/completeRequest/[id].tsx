@@ -25,6 +25,7 @@ import axios from 'axios';
 import { Button } from '@rneui/themed';
 import { colors } from '@/constants/Colors';
 import { ActivityIndicator } from 'react-native-paper';
+import { useAuth } from '@clerk/clerk-expo';
 type Props = {};
 const validationSchema = yup.object().shape({
   role: yup.string().required('Role is required'),
@@ -37,18 +38,10 @@ const CompleteRequest = (props: Props) => {
   const { id } = useLocalSearchParams<{ id: string }>();
 
   const { workspaceId, role: workerRole, orgId } = useDetailsToAdd();
-  console.log(
-    '🚀 ~ CompleteRequest ~ workspaceId',
-    'orgId',
-    workspaceId,
-    workerRole,
-    orgId
-  );
 
   const { onOpen, isOpen, onClose } = useSaved();
-  const { id: isMe, user } = useData();
+  const { userId: isMe } = useAuth();
 
-  console.log('🚀 ~ CompleteRequest ~ isMe:', isMe);
   const queryClient = useQueryClient();
   const router = useRouter();
   const {

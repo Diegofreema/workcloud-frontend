@@ -15,6 +15,7 @@ import { useData } from '@/hooks/useData';
 import { useOpen } from '@/hooks/useOpen';
 import { checkIfEmployed } from '@/lib/helper';
 import { useInfos } from '@/hooks/useGetInfo';
+import { useAuth } from '@clerk/clerk-expo';
 
 type PreviewWorker = {
   name: any;
@@ -126,7 +127,7 @@ export const UserPreview = ({
 };
 
 export const WorkPreview = ({ item }: { item: Requests }) => {
-  const { id: userId } = useData();
+  const { userId } = useAuth();
   const { onOpen } = useOpen();
   const { getInfoIds } = useInfos();
   const [cancelling, setCancelling] = useState(false);
@@ -135,15 +136,17 @@ export const WorkPreview = ({ item }: { item: Requests }) => {
     item;
 
   const acceptRequest = async () => {
+    if (!userId) return;
     setAccepting(true);
     const isWorking = await checkIfEmployed(userId);
-    if (isWorking?.userId) {
+    const isWorkingBool = !!isWorking;
+    if (isWorkingBool) {
       onOpen();
       getInfoIds({
         newWorkspaceId: workspaceId as string,
         requestId: id,
-        workerId: isWorking?.userId,
-        workspaceId: isWorking?.id,
+        workerId: isWorking?.workerId!,
+        workspaceId: isWorking?.id.toString(),
       });
       return;
     }
@@ -162,12 +165,15 @@ export const WorkPreview = ({ item }: { item: Requests }) => {
         .update({
           role: role,
           bossId: from?.userId,
-          workspaceId: workspaceId,
+          workspaceId: +workspaceId,
           organizationId: from?.organizationId?.id,
         })
         .eq('id', to.workerId);
       if (!error && !err) {
-        const { error } = await supabase.from('request').delete().eq('id', id);
+        const { error } = await supabase
+          .from('request')
+          .update({ accepted: true })
+          .eq('id', id);
         Toast.show({
           type: 'success',
           text1: 'Request has been accepted',
@@ -196,7 +202,10 @@ export const WorkPreview = ({ item }: { item: Requests }) => {
   const rejectRequest = async () => {
     setCancelling(true);
     try {
-      const { error } = await supabase.from('request').delete().eq('id', id);
+      const { error } = await supabase
+        .from('request')
+        .update({ accepted: false })
+        .eq('id', id);
 
       if (!error) {
         Toast.show({
@@ -229,6 +238,7 @@ export const WorkPreview = ({ item }: { item: Requests }) => {
         source={{
           uri: from?.organizationId?.avatar || 'https://placehold.co/100x100',
         }}
+        placeholder={require('@/assets/images/pl.png')}
         style={{ width: 60, height: 60, borderRadius: 9999 }}
         contentFit="cover"
       />
@@ -253,7 +263,16 @@ export const WorkPreview = ({ item }: { item: Requests }) => {
         <MyText style={{}} poppins="Medium" fontSize={12}>
           Payment: {salary} naira
         </MyText>
-
+        {item?.accepted && (
+          <MyText style={{ color: 'green' }} poppins="Medium" fontSize={15}>
+            Accepted
+          </MyText>
+        )}
+        {!item?.accepted && item?.accepted !== null && (
+          <MyText style={{ color: 'red' }} poppins="Medium" fontSize={15}>
+            Declined
+          </MyText>
+        )}
         <HStack gap={10} mt={20}>
           <Button
             contentStyle={{ backgroundColor: '#C0D1FE', borderRadius: 5 }}

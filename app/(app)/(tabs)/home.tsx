@@ -28,6 +28,7 @@ export default function TabOneScreen() {
     refetch,
     error: errorAuth,
   } = useAuth();
+  console.log(errorAuth);
 
   useEffect(() => {
     if (!data) return;
@@ -44,6 +45,7 @@ export default function TabOneScreen() {
     error,
     isPaused: isConnectionsPaused,
   } = useGetConnection(data?.userId || '');
+  console.log({ error, isConnectionsPaused });
 
   const { onOpen } = useOrganizationModal();
   const handleRefetch = () => {
@@ -56,7 +58,6 @@ export default function TabOneScreen() {
   if (isError || isErrorConnections || isConnectionsPaused) {
     return <ErrorComponent refetch={refetch} />;
   }
-  console.log(isPending, isPendingConnections);
 
   if (isPending || isPendingConnections) {
     return <LoadingComponent />;

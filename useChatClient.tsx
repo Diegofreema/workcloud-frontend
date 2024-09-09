@@ -11,7 +11,9 @@ const chatClient = StreamChat.getInstance(chatApiKey);
 
 export const useChatClient = () => {
   const { user } = useUser();
-  const { data } = useProfile(user?.id);
+  const { data, isPending } = useProfile(user?.id);
+  console.log(data);
+
   const userData = {
     id: user?.id as string,
     name: user?.fullName!,
@@ -20,10 +22,13 @@ export const useChatClient = () => {
 
   const [clientIsReady, setClientIsReady] = useState(false);
   useEffect(() => {
+    if (!data) return;
     const setupClient = async () => {
       try {
         chatClient.connectUser(userData, data?.profile?.streamToken);
-        setClientIsReady(true);
+        if (!isPending) {
+          setClientIsReady(true);
+        }
       } catch (error) {
         if (error instanceof Error) {
           console.error(
@@ -38,7 +43,7 @@ export const useChatClient = () => {
     if (!chatClient.userID) {
       setupClient();
     }
-  }, [data]);
+  }, [data, isPending]);
   return {
     clientIsReady,
   };

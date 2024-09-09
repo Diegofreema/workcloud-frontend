@@ -72,10 +72,29 @@
         {
           "android": {
             "extraMavenRepos": [
-              "./node_modules/@notifee/react-native/android/libs"
+              "../../node_modules/@notifee/react-native/android/libs"
             ],
-            "enableDexingArtifactTransform": false
+            "minSdkVersion": 24
           }
+        }
+      ],
+      [
+        "expo-media-library",
+        {
+          "photosPermission": "$(PRODUCT_NAME) would like access to your photo gallery to share image in a message.",
+          "savePhotosPermission": "$(PRODUCT_NAME) would like to save photos to your photo gallery after downloading from a message."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "cameraPermission": "$(PRODUCT_NAME) would like to use your camera to share image in a message."
+        }
+      ],
+      [
+        "expo-av",
+        {
+          "microphonePermission": "$(PRODUCT_NAME) would like to use your microphone for voice recording."
         }
       ],
       "expo-font"

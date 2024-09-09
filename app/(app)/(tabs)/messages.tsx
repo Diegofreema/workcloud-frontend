@@ -100,7 +100,7 @@ const Preview = (props: ChannelPreviewMessengerProps) => {
     getUnread(unread || 0);
   }, [unread]);
 
-  const backgroundColor = unread ? colors.dialPad : 'transparent';
+  const backgroundColor = unread ? colors.gray : 'transparent';
   return (
     <View style={{ backgroundColor: backgroundColor }}>
       <ChannelPreview
