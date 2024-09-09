@@ -136,7 +136,7 @@ const Overview = (props: Props) => {
         },
         (payload) => {
           if (payload) {
-            queryClient.invalidateQueries({ queryKey: ['followers', id] });
+            queryClient.invalidateQueries({ queryKey: ['followers'] });
           }
           console.log('FollowersChange received!', payload);
         }

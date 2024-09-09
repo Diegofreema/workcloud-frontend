@@ -11,13 +11,13 @@ import { supabase } from '@/lib/supabase';
 import { useChatClient } from '@/useChatClient';
 import { useUser } from '@clerk/clerk-expo';
 import { StatusBar } from '@gluestack-ui/themed';
+import { onRefresh } from '@/lib/helper';
 
 const api = 'cnvc46pm8uq9';
 const client = StreamChat.getInstance('cnvc46pm8uq9');
 
 export default function AppLayout() {
   const { clientIsReady } = useChatClient();
-  console.log(clientIsReady, 'clientIsReady');
 
   const { isLoaded, isSignedIn } = useUser();
   const { darkMode } = useDarkMode();
@@ -34,9 +34,9 @@ export default function AppLayout() {
           schema: 'public',
         },
         (payload) => {
-          // if (payload) {
-          //   onRefresh(id);
-          // }
+          if (payload) {
+            onRefresh();
+          }
           console.log('Change received!', payload);
         }
       )

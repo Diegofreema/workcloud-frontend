@@ -132,13 +132,16 @@ export const WorkPreview = ({ item }: { item: Requests }) => {
   const { getInfoIds } = useInfos();
   const [cancelling, setCancelling] = useState(false);
   const [accepting, setAccepting] = useState(false);
+  const queryClient = useQueryClient();
   const { id, role, from, to, workspaceId, salary, responsibility, qualities } =
     item;
 
   const acceptRequest = async () => {
     if (!userId) return;
+
     setAccepting(true);
     const isWorking = await checkIfEmployed(userId);
+
     const isWorkingBool = !!isWorking;
     if (isWorkingBool) {
       onOpen();
@@ -148,6 +151,8 @@ export const WorkPreview = ({ item }: { item: Requests }) => {
         workerId: isWorking?.workerId!,
         workspaceId: isWorking?.id.toString(),
       });
+      console.log(isWorking);
+
       return;
     }
     try {
@@ -196,6 +201,7 @@ export const WorkPreview = ({ item }: { item: Requests }) => {
       });
     } finally {
       setAccepting(false);
+      queryClient.invalidateQueries({ queryKey: ['pending_requests'] });
     }
   };
 
@@ -229,6 +235,7 @@ export const WorkPreview = ({ item }: { item: Requests }) => {
       });
     } finally {
       setCancelling(false);
+      queryClient.invalidateQueries({ queryKey: ['pending_requests'] });
     }
   };
 
@@ -273,30 +280,32 @@ export const WorkPreview = ({ item }: { item: Requests }) => {
             Declined
           </MyText>
         )}
-        <HStack gap={10} mt={20}>
-          <Button
-            contentStyle={{ backgroundColor: '#C0D1FE', borderRadius: 5 }}
-            style={{ borderRadius: 5 }}
-            loading={cancelling}
-            onPress={rejectRequest}
-            textColor="#0047FF"
-          >
-            <Text style={{ color: '#0047FF', fontFamily: 'PoppinsMedium' }}>
-              Decline
-            </Text>
-          </Button>
-          <Button
-            contentStyle={{ backgroundColor: '#0047FF' }}
-            style={{ borderRadius: 5 }}
-            loading={accepting}
-            onPress={acceptRequest}
-            textColor="white"
-          >
-            <Text style={{ color: 'white', fontFamily: 'PoppinsMedium' }}>
-              Accept
-            </Text>
-          </Button>
-        </HStack>
+        {item?.accepted === null && (
+          <HStack gap={10} mt={20}>
+            <Button
+              contentStyle={{ backgroundColor: '#C0D1FE', borderRadius: 5 }}
+              style={{ borderRadius: 5 }}
+              loading={cancelling}
+              onPress={rejectRequest}
+              textColor="#0047FF"
+            >
+              <Text style={{ color: '#0047FF', fontFamily: 'PoppinsMedium' }}>
+                Decline
+              </Text>
+            </Button>
+            <Button
+              contentStyle={{ backgroundColor: '#0047FF' }}
+              style={{ borderRadius: 5 }}
+              loading={accepting}
+              onPress={acceptRequest}
+              textColor="white"
+            >
+              <Text style={{ color: 'white', fontFamily: 'PoppinsMedium' }}>
+                Accept
+              </Text>
+            </Button>
+          </HStack>
+        )}
       </VStack>
     </HStack>
   );

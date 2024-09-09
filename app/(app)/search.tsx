@@ -50,8 +50,10 @@ const Search = (props: Props) => {
 
   const { organization } = data;
   const { org } = nameData;
+  const uniqueOrgs = [
+    ...new Set([...org, ...organization].map((item) => JSON.stringify(item))),
+  ].map((item) => JSON.parse(item));
 
-  const orgs = [...organization, ...org];
   return (
     <Container>
       <SearchHeader value={value} setValue={setValue} />
@@ -69,7 +71,8 @@ const Search = (props: Props) => {
         )}
         style={{ marginTop: 20 }}
         showsVerticalScrollIndicator={false}
-        data={orgs}
+        data={uniqueOrgs}
+        keyExtractor={(item, index) => item?.id.toString() + index}
         renderItem={({ item }) => {
           return <OrganizationItem item={item} />;
         }}

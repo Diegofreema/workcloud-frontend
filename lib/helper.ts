@@ -140,38 +140,44 @@ export const onDeleteImage = async (path: string) => {
   }
 };
 
-export const onRefresh = async (id: string) => {
+const queryKey = [
+  'wk',
+  'waitList',
+  'pending_requests',
+  'myStaffs',
+  'connections',
+  'organization',
+  'assignedWk',
+  'profile',
+  'posts',
+  'wks',
+  'wk',
+  'personal',
+  'search',
+  'search_name',
+  'workers',
+  'personal_workers',
+  'other_workers',
+  'pending_worker',
+  'pending_requests',
+  'worker',
+  'request',
+  'single',
+  'single_orgs',
+  'get_single_orgs',
+  'use_organization',
+  'followers',
+];
+export const onRefresh = async () => {
   queryClient.invalidateQueries({
-    queryKey: [
-      'wk',
-      id,
-      'waitList',
-      'pending_requests',
-      'myStaffs',
-      'connections',
-      'organization',
-      'assignedWk',
-      'profile',
-      'posts',
-      'wks',
-      'wk',
-      'personal',
-      'search',
-      'search_name',
-      'workers',
-      'personal_workers',
-      'other_workers',
-      'pending_worker',
-      'pending_requests',
-      'worker',
-      'request',
-      'single',
-      'single_orgs',
-      'get_single_orgs',
-      'use_organization',
-      'followers',
-    ],
-    refetchType: 'all',
+    predicate: (query) => {
+      queryKey.forEach((key) => {
+        if (query.queryKey?.includes(key)) {
+          return true;
+        }
+      });
+      return false;
+    },
   });
 };
 
@@ -260,16 +266,13 @@ export const checkIfEmployed = async (userId: string) => {
       .single();
 
     if (error) {
-      console.log(error);
-      throw error.message;
+      console.log(error, 'error');
     }
 
     if (!error && data?.workerId) {
       return data;
     }
-    return null;
   } catch (error: any) {
-    console.log(error);
-    throw error?.message;
+    console.log(error, 'error');
   }
 };

@@ -1,43 +1,39 @@
-import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  FlatList,
-  Pressable,
-  ScrollView,
-  useWindowDimensions,
-  NativeSyntheticEvent,
-  NativeScrollEvent,
-  Dimensions,
-} from 'react-native';
-import React, { useEffect, useRef, useState } from 'react';
-import { router, useLocalSearchParams, useRouter } from 'expo-router';
-import { useGetOrg, useGetPosts, useOrgsWorkers } from '@/lib/queries';
+import { EmptyText } from '@/components/EmptyText';
+import { HeaderNav } from '@/components/HeaderNav';
 import { ErrorComponent } from '@/components/Ui/ErrorComponent';
 import { LoadingComponent } from '@/components/Ui/LoadingComponent';
-import { HeaderNav } from '@/components/HeaderNav';
-import { Box, HStack, VStack } from '@gluestack-ui/themed';
-import { Avatar } from 'react-native-paper';
-import signup from '../board';
 import { MyText } from '@/components/Ui/MyText';
 import { colors } from '@/constants/Colors';
 import { WorkerWithWorkspace } from '@/constants/types';
-import { supabase } from '@/lib/supabase';
-import { useData } from '@/hooks/useData';
-import Toast from 'react-native-toast-message';
-import { EmptyText } from '@/components/EmptyText';
-import { useQueryClient } from '@tanstack/react-query';
-import { PostComponent } from '@/components/PostComponent';
-import Carousel from 'react-native-reanimated-carousel';
 import { useDarkMode } from '@/hooks/useDarkMode';
-import { MyButton } from '@/components/Ui/MyButton';
-import { useChatContext } from 'stream-chat-expo';
+import { useData } from '@/hooks/useData';
+import { useGetOrg, useGetPosts, useOrgsWorkers } from '@/lib/queries';
+import { supabase } from '@/lib/supabase';
+import { useAuth, useUser } from '@clerk/clerk-expo';
 import { FontAwesome6 } from '@expo/vector-icons';
+import { HStack, VStack } from '@gluestack-ui/themed';
+import { useQueryClient } from '@tanstack/react-query';
+import { format } from 'date-fns';
+import { router, useLocalSearchParams, useRouter } from 'expo-router';
+import React, { useEffect } from 'react';
+import {
+  FlatList,
+  Image,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  useWindowDimensions,
+  View,
+} from 'react-native';
+import { Avatar } from 'react-native-paper';
+import Carousel from 'react-native-reanimated-carousel';
+import Toast from 'react-native-toast-message';
+import { useChatContext } from 'stream-chat-expo';
 type Props = {};
 
 const Reception = (props: Props) => {
-  const { id: userId } = useData();
+  const { userId } = useAuth();
   const queryClient = useQueryClient();
   const { id } = useLocalSearchParams<{ id: string }>();
   const { data, isPending, error, refetch, isPaused } = useGetOrg(id);
@@ -66,23 +62,23 @@ const Reception = (props: Props) => {
       const { data, error: err } = await supabase
         .from('connections')
         .select('connectedTo, id')
-        .eq('owner', userId);
+        .eq('owner', userId!);
 
       const connected = data?.find(
-        (item) => item?.connectedTo.toString() === id
+        (item) => item?.connectedTo?.toString() === id
       );
 
       if (connected) {
         const { error } = await supabase
           .from('connections')
           .update({
-            created_at: new Date(),
+            created_at: format(new Date(), 'dd/MM/yyyy HH:mm'),
           })
           .eq('id', connected?.id);
       } else {
         const { error } = await supabase.from('connections').insert({
           owner: userId,
-          connectedTo: id,
+          connectedTo: +id,
         });
       }
 
@@ -125,7 +121,7 @@ const Reception = (props: Props) => {
     <ScrollView
       showsVerticalScrollIndicator={false}
       contentContainerStyle={{ paddingBottom: 20, flexGrow: 1 }}
-      style={{ flex: 1, marginHorizontal: 20 }}
+      style={{ flex: 1, paddingHorizontal: 20, backgroundColor: 'white' }}
     >
       <HeaderNav
         title={org?.name}
@@ -242,12 +238,13 @@ const Representatives = ({ data }: { data: WorkerWithWorkspace[] }) => {
 
 const RepresentativeItem = ({ item }: { item: WorkerWithWorkspace }) => {
   const router = useRouter();
-  const { id } = useData();
+  const { userId: id } = useAuth();
   const { client } = useChatContext();
   const handlePress = async () => {
     const { data, error: err } = await supabase
       .from('waitList')
       .select()
+      // @ts-ignore
       .eq('workspace', item?.workspaceId?.id);
 
     if (!err) {
@@ -309,7 +306,7 @@ const RepresentativeItem = ({ item }: { item: WorkerWithWorkspace }) => {
 
   const onPress = async () => {
     const channel = client.channel('messaging', {
-      members: [id, item?.userId?.userId],
+      members: [id!, item?.userId?.userId!],
     });
 
     await channel.watch();
