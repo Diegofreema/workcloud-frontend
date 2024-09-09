@@ -1,40 +1,35 @@
-import {
-  View,
-  Text,
-  StyleSheet,
-  Pressable,
-  TextInputProps,
-} from 'react-native';
+import { LoadingComponent } from '@/components/Ui/LoadingComponent';
+import { MyText } from '@/components/Ui/MyText';
+import { colors } from '@/constants/Colors';
+import { useDarkMode } from '@/hooks/useDarkMode';
+import { useData } from '@/hooks/useData';
+import { useGetWorkerProfile } from '@/lib/queries';
+import { EvilIcons, Feather, FontAwesome } from '@expo/vector-icons';
+import { HStack, VStack } from '@gluestack-ui/themed';
+import { router, useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useMemo, useState } from 'react';
+import {
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInputProps,
+  View,
+} from 'react-native';
+import { ActivityIndicator, Avatar } from 'react-native-paper';
+import { Channel as ChannelType } from 'stream-chat';
 import {
   AutoCompleteInput,
   Channel,
-  DateHeader,
   FileAttachment,
   FileUploadPreview,
   Gallery,
   ImageUploadPreview,
-  InlineDateSeparatorProps,
-  MessageFooterProps,
   MessageInput,
   MessageList,
   useChatContext,
   useMessageContext,
   useMessageInputContext,
 } from 'stream-chat-expo';
-import { router, useLocalSearchParams } from 'expo-router';
-import { Channel as ChannelType } from 'stream-chat';
-import { LoadingComponent } from '@/components/Ui/LoadingComponent';
-import { colors } from '@/constants/Colors';
-import { HStack, Button, VStack } from '@gluestack-ui/themed';
-import { EvilIcons, Feather, FontAwesome } from '@expo/vector-icons';
-import { Image } from 'expo-image';
-import { format } from 'date-fns';
-import { useGetWorkerProfile } from '@/lib/queries';
-import { useData } from '@/hooks/useData';
-import { ActivityIndicator, Avatar } from 'react-native-paper';
-import { useDarkMode } from '@/hooks/useDarkMode';
-import { MyText } from '@/components/Ui/MyText';
 
 type Props = {};
 
@@ -58,7 +53,6 @@ const SingleChat = (props: Props) => {
       MessageSimple={CustomMessage}
       Input={CustomInput}
       channel={channel}
-      formatDate={(dateString) => `${dateString.toLocaleString()}`}
     >
       <MessageList
         FooterComponent={CustomHeaderComponent}
@@ -120,7 +114,7 @@ const CustomMessage = () => {
           key={index}
           style={{ alignSelf: isMyMessage ? 'flex-end' : 'flex-start' }}
         >
-          <Gallery />
+          {item.image_url && <Gallery />}
         </View>
       ) : (
         <FileAttachment

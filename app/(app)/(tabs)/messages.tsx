@@ -15,11 +15,12 @@ import { useDarkMode } from '../../../hooks/useDarkMode';
 import { colors } from '@/constants/Colors';
 import { useData } from '@/hooks/useData';
 import { useUnread } from '@/hooks/useUnread';
+import { useAuth } from '@clerk/clerk-expo';
 
 type Props = {};
 
 const messages = (props: Props) => {
-  const { id: userId } = useData();
+  const { userId } = useAuth();
   const { darkMode } = useDarkMode();
   const router = useRouter();
   const onSelect = (id: any) => {
@@ -45,7 +46,7 @@ const messages = (props: Props) => {
             backgroundColor: darkMode === 'dark' ? 'black' : 'white',
           },
         }}
-        filters={{ members: { $in: [userId] } }}
+        filters={{ members: { $in: [userId!] } }}
         onSelect={(channel) => onSelect(channel.id)}
         EmptyStateIndicator={EmptyComponent}
         HeaderErrorIndicator={ErrorComponent}

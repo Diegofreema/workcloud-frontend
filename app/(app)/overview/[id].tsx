@@ -41,6 +41,7 @@ import { MyButton } from '@/components/Ui/MyButton';
 import { Box } from '@gluestack-ui/themed';
 import Toast from 'react-native-toast-message';
 import { onFollow, onUnFollow } from '@/lib/helper';
+import { useAuth } from '@clerk/clerk-expo';
 
 type Props = {};
 type SubProps = {
@@ -99,7 +100,7 @@ const Overview = (props: Props) => {
   const { id } = useLocalSearchParams<{ id: string }>();
   const [following, setFollowing] = useState(false);
   console.log(id);
-  const { id: userId } = useData();
+  const { userId } = useAuth();
   const { darkMode } = useDarkMode();
   const [loading, setLoading] = useState(false);
   const queryClient = useQueryClient();
@@ -165,17 +166,17 @@ const Overview = (props: Props) => {
     setLoading(true);
     try {
       if (isFollowingMemo) {
-        await onUnFollow(organization?.id, organization?.name, userId);
+        await onUnFollow(organization?.id, organization?.name, userId!);
         setFollowing(false);
       } else {
-        onFollow(organization?.id, organization?.name, userId);
+        onFollow(organization?.id, organization?.name, userId!);
         setFollowing(true);
       }
     } catch (error) {
       console.log(error);
       Toast.show({
         type: 'error',
-        text1: `Failed to ${isFollowingMemo ? 'unfollow' : 'follow'}`,
+        text1: `Failed to ${isFollowingMemo ? 'Leave' : 'Join'}`,
         text2: 'Please try again later',
         position: 'top',
       });
@@ -188,7 +189,7 @@ const Overview = (props: Props) => {
 
   const startDay = organization?.workDays?.split('-')[0];
   const endDay = organization?.workDays?.split('-')[1];
-  const unfollowingText = loading ? 'UnJoining...' : 'UnJoin';
+  const unfollowingText = loading ? 'Leaving...' : 'Leave';
   const followingText = loading ? 'Joining...' : 'Join';
   return (
     <Container>
