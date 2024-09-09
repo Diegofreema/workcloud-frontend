@@ -17,6 +17,7 @@ import { supabase } from '@/lib/supabase';
 import { useData } from '@/hooks/useData';
 import Toast from 'react-native-toast-message';
 import { useDarkMode } from '@/hooks/useDarkMode';
+import { useAuth } from '@clerk/clerk-expo';
 
 const roles = [
   'Manager',
@@ -59,7 +60,7 @@ const roles = [
 export const SelectNewRow = ({ id }: { id: string }) => {
   const { isOpen, onClose } = useSelectNewRow();
   const { getData } = useDetailsToAdd();
-  const { id: userId } = useData();
+  const { userId } = useAuth();
   const { darkMode } = useDarkMode();
   const [profile, setProfile] = useState<Profile | null>(null);
 
@@ -74,7 +75,7 @@ export const SelectNewRow = ({ id }: { id: string }) => {
             .select(
               `name, avatar, streamToken, email, userId, organizationId (*), workerId (*)`
             )
-            .eq('userId', userId)
+            .eq('userId', userId!)
             .single();
           // @ts-ignore
           setProfile(data);

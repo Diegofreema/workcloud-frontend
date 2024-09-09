@@ -1,5 +1,5 @@
 import { LoadingComponent } from '@/components/Ui/LoadingComponent';
-import { Redirect, Stack, usePathname } from 'expo-router';
+import { Redirect, Stack, usePathname, useSegments } from 'expo-router';
 import { useEffect } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { StreamChat } from 'stream-chat';
@@ -20,6 +20,8 @@ export default function AppLayout() {
   const { isLoaded, isSignedIn } = useUser();
   const { darkMode } = useDarkMode();
   const pathname = usePathname();
+  const segment = useSegments();
+  console.log(segment);
   useEffect(() => {
     const channel = supabase
       .channel('workcloud')

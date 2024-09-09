@@ -17,13 +17,14 @@ import { WK } from '@/constants/types';
 import { MyText } from '@/components/Ui/MyText';
 import Toast from 'react-native-toast-message';
 import { Container } from '@/components/Ui/Container';
+import { useUser } from '@clerk/clerk-expo';
 
 type Props = {};
 
 const workspace = (props: Props) => {
-  const { id } = useData();
+  const { user } = useUser();
   const { data, isPending, refetch, isError, isPaused, error } =
-    usePersonalOrgs(id);
+    usePersonalOrgs(user?.id);
   const { darkMode } = useDarkMode();
   const {
     data: otherOrgs,
@@ -33,7 +34,7 @@ const workspace = (props: Props) => {
     isPaused: isPausedOther,
     isRefetching,
     error: errorOther,
-  } = useOtherOrgs(id);
+  } = useOtherOrgs(user?.id);
 
   const handleRefetch = () => {
     refetch();

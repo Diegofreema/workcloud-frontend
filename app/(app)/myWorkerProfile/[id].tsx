@@ -22,11 +22,12 @@ import { useChatContext } from 'stream-chat-expo';
 import { useData } from '@/hooks/useData';
 import { Container } from '@/components/Ui/Container';
 import { useDarkMode } from '@/hooks/useDarkMode';
+import { useAuth } from '@clerk/clerk-expo';
 type Props = {};
 
 const Profile = (props: Props) => {
-  const { id } = useData();
-  console.log('🚀 ~ Profile ~ id:', id);
+  const { userId: id } = useAuth();
+
   const { client } = useChatContext();
   const { darkMode } = useDarkMode();
 

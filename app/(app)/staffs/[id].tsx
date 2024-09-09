@@ -1,33 +1,30 @@
-import { FlatList, StyleSheet, Text, View } from 'react-native';
-import React, { useEffect, useMemo, useState } from 'react';
-import { useGetMyStaffs, useGetPersonalWorkers } from '@/lib/queries';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { AuthHeader } from '@/components/AuthHeader';
+import { AddStaff, Menu } from '@/components/Dialogs/AddStaff';
+import { RemoveUser } from '@/components/Dialogs/RemoveUser';
+import { SelectNewRow } from '@/components/Dialogs/SelectNewRow';
+import { EmptyText } from '@/components/EmptyText';
+import { Container } from '@/components/Ui/Container';
+import { DottedButton } from '@/components/Ui/DottedButton';
 import { ErrorComponent } from '@/components/Ui/ErrorComponent';
 import { LoadingComponent } from '@/components/Ui/LoadingComponent';
-import { AuthHeader } from '@/components/AuthHeader';
 import { MyText } from '@/components/Ui/MyText';
-import { colors } from '@/constants/Colors';
-import { Pressable } from 'react-native';
-import { DottedButton } from '@/components/Ui/DottedButton';
-import { WorkType, Workers } from '@/constants/types';
-import { AddStaff, Menu } from '@/components/Dialogs/AddStaff';
-import { useAddStaff } from '@/hooks/useAddStaff';
-import { SelectNewRow } from '@/components/Dialogs/SelectNewRow';
-import { HStack } from '@gluestack-ui/themed';
-import { WorkerProfileArray } from '../../../constants/types';
 import { UserPreview } from '@/components/Ui/UserPreview';
-import { EmptyText } from '@/components/EmptyText';
-import { useSelectNewRow } from '@/hooks/useSelectNewRow';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { useHandleStaff } from '@/hooks/useHandleStaffs';
-import { RemoveUser } from '@/components/Dialogs/RemoveUser';
-import { Container } from '@/components/Ui/Container';
+import { colors } from '@/constants/Colors';
+import { WorkType } from '@/constants/types';
 import { useDarkMode } from '@/hooks/useDarkMode';
-import { supabase } from '@/lib/supabase';
-import { useQueryClient } from '@tanstack/react-query';
 import { useData } from '@/hooks/useData';
+import { useHandleStaff } from '@/hooks/useHandleStaffs';
+import { useSelectNewRow } from '@/hooks/useSelectNewRow';
+import { useGetMyStaffs } from '@/lib/queries';
+import { supabase } from '@/lib/supabase';
+import { useAuth } from '@clerk/clerk-expo';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { HStack } from '@gluestack-ui/themed';
+import { useQueryClient } from '@tanstack/react-query';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import React, { useEffect, useMemo, useState } from 'react';
+import { FlatList, Pressable, StyleSheet, View } from 'react-native';
 
-type Props = {};
 const allRoles = [
   'All',
   'Customer service',
@@ -36,16 +33,18 @@ const allRoles = [
   'Logistics',
   'ICT',
 ];
-const Staffs = (props: Props) => {
+const Staffs = () => {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { id: userId } = useData();
-  const [selectId, setSelectId] = useState('');
+  const { userId } = useAuth();
+
   const [isVisible, setIsVisible] = useState(false);
   const queryClient = useQueryClient();
   const { onOpen: onOpenSelectRowModal, onClose: onCloseSelectRow } =
     useSelectNewRow();
   const { getItem, item: staff } = useHandleStaff();
-
+  const onNavRole = () => {
+    router.push('/role');
+  };
   const [role, setRole] = useState('All');
   const router = useRouter();
   const {
@@ -163,7 +162,7 @@ const Staffs = (props: Props) => {
           keyExtractor={(item) => item}
         />
         <HStack gap={10}>
-          <DottedButton text="Add New Staff" onPress={onOpenSelectRowModal} />
+          <DottedButton text="Add New Staff" onPress={onNavRole} />
           <DottedButton
             isIcon={false}
             text="Pending Staffs"

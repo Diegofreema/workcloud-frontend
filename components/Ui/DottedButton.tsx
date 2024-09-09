@@ -1,9 +1,7 @@
-import { StyleSheet, View, Text, Pressable } from 'react-native';
-import { MyText } from './MyText';
-import { AntDesign } from '@expo/vector-icons';
 import { colors } from '@/constants/Colors';
-import { Button } from 'react-native-paper';
 import { useDarkMode } from '@/hooks/useDarkMode';
+import { AntDesign } from '@expo/vector-icons';
+import { Button } from 'react-native-paper';
 
 type Props = {
   onPress: () => void;
@@ -25,6 +23,7 @@ export const DottedButton = ({
         borderRadius: 10,
         borderStyle: 'dashed',
         marginTop: 20,
+        flex: 1,
       }}
       contentStyle={{ height: 50 }}
       icon={() =>
@@ -32,30 +31,15 @@ export const DottedButton = ({
           <AntDesign
             name="plus"
             size={20}
-            color={darkMode === 'dark' ? 'white' : 'dark'}
+            color={darkMode === 'dark' ? 'white' : 'black'}
           />
         )
       }
       onPress={onPress}
-      textColor={darkMode === 'dark' ? 'white' : 'dark'}
+      textColor={darkMode === 'dark' ? 'white' : 'black'}
       labelStyle={{ fontFamily: 'PoppinsLight' }}
     >
       {text}
     </Button>
   );
 };
-
-const styles = StyleSheet.create({
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    marginTop: 20,
-    borderWidth: 1,
-    borderColor: colors.gray10,
-    padding: 10,
-    borderRadius: 10,
-    borderStyle: 'dashed',
-    justifyContent: 'center',
-  },
-});

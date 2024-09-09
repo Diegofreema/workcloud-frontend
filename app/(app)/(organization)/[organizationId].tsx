@@ -1,28 +1,35 @@
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import React, { useEffect, useState } from 'react';
+import {
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  useWindowDimensions,
+  View,
+} from 'react-native';
 
-import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useGetPersonalWk, usePersonalOrgs } from '../../../lib/queries';
-import { useDarkMode } from '../../../hooks/useDarkMode';
-import { colors } from '../../../constants/Colors';
 import { EvilIcons } from '@expo/vector-icons';
 import * as Linking from 'expo-linking';
+import { useRouter } from 'expo-router';
 import { ErrorComponent } from '../../../components/Ui/ErrorComponent';
+import { colors } from '../../../constants/Colors';
+import { useDarkMode } from '../../../hooks/useDarkMode';
+import { useGetPersonalWk, usePersonalOrgs } from '../../../lib/queries';
 
-import { useCreate } from '../../../hooks/useCreate';
-import { LoadingComponent } from '../../../components/Ui/LoadingComponent';
-import { useData } from '@/hooks/useData';
-import { CreateWorkspaceModal } from '@/components/Dialogs/CreateWorkspace';
-import { SelectRow } from '@/components/Dialogs/SelectRow';
-import { DeleteWksSpaceModal } from '@/components/Dialogs/DeleteWks';
 import { AuthHeader } from '@/components/AuthHeader';
-import { Image } from 'expo-image';
-import { WorkspaceDetails } from '@/components/WorkspaceDetails';
-import { Button } from 'react-native-paper';
-import { useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/lib/supabase';
-import { Profile } from '@/constants/types';
+import { CreateWorkspaceModal } from '@/components/Dialogs/CreateWorkspace';
+import { DeleteWksSpaceModal } from '@/components/Dialogs/DeleteWks';
+import { SelectRow } from '@/components/Dialogs/SelectRow';
 import { MyText } from '@/components/Ui/MyText';
+import { WorkspaceDetails } from '@/components/WorkspaceDetails';
+import { Profile } from '@/constants/types';
+import { supabase } from '@/lib/supabase';
+import { useAuth } from '@clerk/clerk-expo';
+import { useQueryClient } from '@tanstack/react-query';
+import { Image } from 'expo-image';
+import { Button } from 'react-native-paper';
+import { LoadingComponent } from '../../../components/Ui/LoadingComponent';
+import { useCreate } from '../../../hooks/useCreate';
 
 type Props = {};
 type SubProps = {
@@ -66,57 +73,11 @@ type SubProps = {
 //   },
 // ];
 
-export const OrganizationItems = ({ name, text, website }: SubProps) => {
-  const { darkMode } = useDarkMode();
-
-  if (website) {
-    return (
-      <Pressable
-        onPress={() => Linking.openURL('https://' + text)}
-        style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}
-      >
-        <EvilIcons
-          color={darkMode === 'dark' ? colors.white : colors.textGray}
-          name={name}
-          size={24}
-        />
-        <MyText
-          poppins="Bold"
-          style={{
-            color: colors.buttonBlue,
-
-            fontSize: 10,
-          }}
-        >
-          {text}
-        </MyText>
-      </Pressable>
-    );
-  }
-  return (
-    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
-      <EvilIcons
-        color={darkMode === 'dark' ? colors.white : colors.textGray}
-        name={name}
-        size={24}
-      />
-      <Text
-        style={{
-          color: darkMode === 'dark' ? colors.white : colors.textGray,
-          fontFamily: 'PoppinsBold',
-          fontSize: 10,
-        }}
-      >
-        {text}
-      </Text>
-    </View>
-  );
-};
 const OrganizationDetails = (props: Props) => {
-  const { id } = useData();
+  const { userId: id } = useAuth();
   const [profile, setProfile] = useState<Profile | null>(null);
+  const { height } = useWindowDimensions();
 
-  const { organizationId } = useLocalSearchParams<{ organizationId: string }>();
   const { onOpen } = useCreate();
   const { darkMode } = useDarkMode();
   const router = useRouter();
@@ -140,7 +101,7 @@ const OrganizationDetails = (props: Props) => {
             .select(
               `name, avatar, streamToken, email, userId, organizationId (*), workerId (*)`
             )
-            .eq('userId', id)
+            .eq('userId', id!)
             .single();
           // @ts-ignore
           setProfile(data);
@@ -184,9 +145,15 @@ const OrganizationDetails = (props: Props) => {
       <CreateWorkspaceModal workspace={wks} />
       <SelectRow organizationId={organization?.id} profile={profile} />
       <DeleteWksSpaceModal />
-      <View style={{ flex: 1, paddingHorizontal: 20 }}>
+      <View
+        style={{
+          paddingHorizontal: 20,
+          backgroundColor: darkMode === 'dark' ? colors.black : colors.white,
+          height,
+        }}
+      >
         <AuthHeader
-          style={{ marginTop: 10, alignItems: 'center' }}
+          style={{ alignItems: 'center' }}
           path="Manage Organizations"
         />
 
@@ -337,7 +304,7 @@ const OrganizationDetails = (props: Props) => {
                 color: darkMode === 'dark' ? colors.white : colors.black,
               }}
             >
-              Members {organization?.followers?.length}
+              Members {organization?.followers?.length || 0}
             </Text>
           </View>
           <View>
@@ -373,7 +340,7 @@ const OrganizationDetails = (props: Props) => {
               name="Staffs"
             />
             <WorkspaceDetails
-              onPress={() => router.push(`/messages`)}
+              onPress={() => router.push(`/(tabs)/messages`)}
               darkMode={darkMode}
               uri={require('../../../assets/images/message.png')}
               name="Messages"
@@ -426,3 +393,50 @@ const styles = StyleSheet.create({
     height: 50,
   },
 });
+
+export const OrganizationItems = ({ name, text, website }: SubProps) => {
+  const { darkMode } = useDarkMode();
+
+  if (website) {
+    return (
+      <Pressable
+        onPress={() => Linking.openURL('https://' + text)}
+        style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}
+      >
+        <EvilIcons
+          color={darkMode === 'dark' ? colors.white : colors.textGray}
+          name={name}
+          size={24}
+        />
+        <MyText
+          poppins="Bold"
+          style={{
+            color: colors.buttonBlue,
+
+            fontSize: 10,
+          }}
+        >
+          {text}
+        </MyText>
+      </Pressable>
+    );
+  }
+  return (
+    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
+      <EvilIcons
+        color={darkMode === 'dark' ? colors.white : colors.textGray}
+        name={name}
+        size={24}
+      />
+      <Text
+        style={{
+          color: darkMode === 'dark' ? colors.white : colors.textGray,
+          fontFamily: 'PoppinsBold',
+          fontSize: 10,
+        }}
+      >
+        {text}
+      </Text>
+    </View>
+  );
+};

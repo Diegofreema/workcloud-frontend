@@ -1,25 +1,24 @@
-import { View, ScrollView, StyleSheet } from 'react-native';
-import React, { useEffect } from 'react';
-import { AuthTitle } from '../../components/AuthTitle';
-import { Button, Text } from 'react-native-paper';
-import { colors } from '../../constants/Colors';
-import { InputComponent } from '../../components/InputComponent';
-import { useFormik } from 'formik';
 import { useRouter } from 'expo-router';
+import { useFormik } from 'formik';
+import React, { useEffect } from 'react';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import { SelectList } from 'react-native-dropdown-select-list';
+import { Button, Text } from 'react-native-paper';
+import { AuthTitle } from '../../components/AuthTitle';
+import { InputComponent } from '../../components/InputComponent';
+import { colors } from '../../constants/Colors';
 
-import * as yup from 'yup';
-import { defaultStyle, fontFamily } from '../../constants';
-import { AuthHeader } from '../../components/AuthHeader';
-import { useDarkMode } from '../../hooks/useDarkMode';
-import Toast from 'react-native-toast-message';
-import { MyText } from '@/components/Ui/MyText';
-import { useQueryClient } from '@tanstack/react-query';
-import { useData } from '@/hooks/useData';
-import axios from 'axios';
-import { supabase } from '@/lib/supabase';
-import { Select } from '@gluestack-ui/themed';
 import { Container } from '@/components/Ui/Container';
+import { MyText } from '@/components/Ui/MyText';
+import { useData } from '@/hooks/useData';
+import { supabase } from '@/lib/supabase';
+import { useQueryClient } from '@tanstack/react-query';
+import Toast from 'react-native-toast-message';
+import * as yup from 'yup';
+import { AuthHeader } from '../../components/AuthHeader';
+import { fontFamily } from '../../constants';
+import { useDarkMode } from '../../hooks/useDarkMode';
+import { useUser } from '@clerk/clerk-expo';
 type Props = {};
 const validationSchema = yup.object().shape({
   email: yup.string().email('Invalid email').required('Email is required'),
@@ -50,7 +49,7 @@ const genders = [
 ];
 const CreateProfile = (props: Props) => {
   const { darkMode } = useDarkMode();
-  const { user, id } = useData();
+  const { user } = useUser();
 
   const queryClient = useQueryClient();
   const router = useRouter();
@@ -67,7 +66,7 @@ const CreateProfile = (props: Props) => {
     resetForm,
   } = useFormik({
     initialValues: {
-      email: user?.email,
+      email: user?.emailAddresses[0].emailAddress,
       location: '',
       gender: '',
       skills: '',
@@ -108,16 +107,16 @@ const CreateProfile = (props: Props) => {
             .update({
               workerId: data.id,
             })
-            .eq('userId', id);
+            .eq('userId', user?.id!);
           if (!err) {
             Toast.show({
               type: 'success',
               text1: 'Welcome to onboard',
-              text2: `${user?.name} your work profile was created`,
+              text2: `${user?.firstName} your work profile was created`,
             });
             queryClient.invalidateQueries({ queryKey: ['profile'] });
 
-            router.replace(`/myWorkerProfile/${id}`);
+            router.replace(`/myWorkerProfile/${user?.id}`);
             resetForm();
           }
           if (err) {

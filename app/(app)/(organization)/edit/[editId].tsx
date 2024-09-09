@@ -19,7 +19,7 @@ import { AuthHeader } from '../../../../components/AuthHeader';
 import { InputComponent } from '../../../../components/InputComponent';
 import { colors } from '../../../../constants/Colors';
 import axios from 'axios';
-import { format } from 'date-fns';
+import { format, parse, parseISO } from 'date-fns';
 import { onDeleteImage, updateOrg } from '@/lib/helper';
 import { supabase } from '@/lib/supabase';
 import { Organization } from '@/constants/types';
@@ -187,21 +187,28 @@ const Edit = (props: Props) => {
         .select('*')
         .eq('id', editId)
         .single();
-      if (!error) {
+      if (!error && data) {
         setValues({
           ...values,
-          email: data?.email,
-          category: data?.category,
-          location: data?.location,
-          organizationName: data?.name,
-          description: data?.description,
-          websiteUrl: data?.website,
-          startTime: data?.workDays.split('-')[0],
-          endTime: data?.workDays.split('-')[1],
-          image: data?.avatar,
+          email: data?.email!,
+          category: data?.category!,
+          location: data?.location!,
+          organizationName: data?.name!,
+          description: data?.description!,
+          websiteUrl: data?.website!,
+          startTime: data?.workDays!.split('-')[0],
+          endTime: data?.workDays!.split('-')[1],
+          image: data?.avatar!,
         });
 
-        setOrgId(data?.id);
+        const start = parse(data?.start!, 'HH:mm', new Date());
+        const end = parse(data?.end!, 'HH:mm', new Date());
+        console.log(start, end);
+
+        setStartTime(start);
+        setEndTime(end);
+
+        setOrgId(data?.id.toString());
       }
 
       if (error) {
@@ -418,9 +425,10 @@ const Edit = (props: Props) => {
           </Text>
           <View
             style={{
-              flexDirection: 'row',
+              flexDirection: 'column',
               gap: 10,
               width: '100%',
+              marginBottom: 15,
             }}
           >
             <>
@@ -429,11 +437,13 @@ const Edit = (props: Props) => {
                 boxStyles={{
                   ...styles2.border,
                   width: '100%',
+                  justifyContent: 'flex-start',
                 }}
                 inputStyles={{
                   textAlign: 'left',
                   fontSize: 14,
                   borderWidth: 0,
+                  width: '100%',
                 }}
                 fontFamily="PoppinsMedium"
                 setSelected={handleChange('startDay')}
@@ -452,7 +462,11 @@ const Edit = (props: Props) => {
                   backgroundColor: '#E9E9E9',
                   width: '100%',
                 }}
-                inputStyles={{ textAlign: 'left', fontSize: 14 }}
+                inputStyles={{
+                  textAlign: 'left',
+                  fontSize: 14,
+                  width: '100%',
+                }}
                 fontFamily="PoppinsMedium"
                 setSelected={handleChange('endDay')}
                 data={days}
@@ -467,7 +481,7 @@ const Edit = (props: Props) => {
           <Text style={{ marginBottom: 5, fontFamily: 'PoppinsMedium' }}>
             Opening And Closing Time
           </Text>
-          <View style={{ flexDirection: 'row', gap: 10 }}>
+          <View style={{ flexDirection: 'column', gap: 10 }}>
             <>
               <Pressable onPress={showMode} style={styles2.border}>
                 <Text> {`${format(start, 'HH:mm') || ' Opening Time'}`} </Text>
@@ -514,6 +528,7 @@ const Edit = (props: Props) => {
             buttonColor={colors.buttonBlue}
             textColor={colors.white}
             labelStyle={{ fontFamily: 'PoppinsMedium', fontSize: 12 }}
+            contentStyle={{ height: 50, borderRadius: 20 }}
           >
             {isSubmitting ? 'Updating...' : 'Update'}
           </Button>
@@ -533,7 +548,7 @@ const styles2 = StyleSheet.create({
     justifyContent: 'center',
     borderBottomWidth: 1,
     borderBottomColor: '#DADADA',
-    width: '50%',
+    width: '100%',
   },
 });
 const styles = StyleSheet.create({

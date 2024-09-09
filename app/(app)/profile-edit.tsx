@@ -40,9 +40,14 @@ const ProfileEdit = (props: Props) => {
   }
   const assignedWk = data.profile?.workerId?.workspaceId ? 1 : 0;
   const numberOfWorkspace = data.profile?.workspace?.length || 0;
-  console.log(data);
+
   return (
-    <View style={{ flex: 1 }}>
+    <View
+      style={{
+        flex: 1,
+        backgroundColor: darkMode === 'dark' ? 'black' : 'white',
+      }}
+    >
       <View
         style={[
           styles.container,

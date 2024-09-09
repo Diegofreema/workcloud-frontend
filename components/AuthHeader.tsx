@@ -37,7 +37,6 @@ export const AuthHeader = ({ path, style }: Props) => {
           marginBottom: 14,
           marginTop: pathname === '/login' ? 20 : 0,
           flexDirection: 'row',
-
           gap: 10,
         },
         style,

@@ -6,6 +6,7 @@ import { fontFamily } from '../constants';
 import { Input } from '@rneui/themed';
 import { IconNode, InputProps } from '@rneui/base';
 import { MyText } from './Ui/MyText';
+import { RFValue } from 'react-native-responsive-fontsize';
 
 type Props = TextInputProps & {
   placeholder: string;
@@ -47,10 +48,8 @@ export const InputComponent = ({
         <MyText
           poppins="Bold"
           style={{
-            marginBottom: 5,
-
-            fontSize: 12,
-            color: darkMode ? 'white' : 'black',
+            marginBottom: 15,
+            fontSize: RFValue(12),
           }}
         >
           {label}
@@ -61,7 +60,6 @@ export const InputComponent = ({
         placeholder={placeholder}
         containerStyle={{
           justifyContent: 'center',
-
           height: 40,
         }}
         inputContainerStyle={{

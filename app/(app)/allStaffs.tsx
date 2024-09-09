@@ -1,30 +1,27 @@
-import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
-import React, { useEffect, useState } from 'react';
-import { useDetailsToAdd } from '@/hooks/useDetailsToAdd';
-import { AuthHeader } from '@/components/AuthHeader';
+import { EmptyText } from '@/components/EmptyText';
 import { HeaderNav } from '@/components/HeaderNav';
-import { Button } from 'react-native-paper';
-import { EvilIcons } from '@expo/vector-icons';
-import { useGetOtherWorkers, usePendingWorkers } from '@/lib/queries';
+import { Container } from '@/components/Ui/Container';
 import { ErrorComponent } from '@/components/Ui/ErrorComponent';
 import { LoadingComponent } from '@/components/Ui/LoadingComponent';
-import { WorkType, Workers } from '@/constants/types';
-import { HStack, VStack } from '@gluestack-ui/themed';
-import { Image } from 'expo-image';
-import { MyText } from '@/components/Ui/MyText';
-import { useRouter } from 'expo-router';
 import { UserPreview } from '@/components/Ui/UserPreview';
-import { EmptyText } from '@/components/EmptyText';
-import { useData } from '@/hooks/useData';
-import { Container } from '@/components/Ui/Container';
+import { Workers } from '@/constants/types';
 import { useDarkMode } from '@/hooks/useDarkMode';
+import { useData } from '@/hooks/useData';
+import { useDetailsToAdd } from '@/hooks/useDetailsToAdd';
+import { useGetOtherWorkers } from '@/lib/queries';
+import { useAuth } from '@clerk/clerk-expo';
+import { EvilIcons } from '@expo/vector-icons';
+import React, { useEffect, useState } from 'react';
+import { FlatList, View } from 'react-native';
+import { Button } from 'react-native-paper';
 
 type Props = {};
 
 const AllStaffs = (props: Props) => {
   const { workspaceId, role } = useDetailsToAdd();
-  const { id: userId } = useData();
+  const { userId } = useAuth();
   const [staffs, setStaffs] = useState<Workers[]>();
+  console.log(role, 'role');
 
   const {
     data,

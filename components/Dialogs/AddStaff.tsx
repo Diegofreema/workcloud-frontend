@@ -27,8 +27,7 @@ export const AddStaff = () => {
   const router = useRouter();
 
   const onOpenSelectRow = () => {
-    onClose();
-    onOpenSelectRowModal();
+    router.push('/role');
   };
 
   return (
@@ -127,7 +126,7 @@ export const Menu = ({ isVisible, setIsVisible, array }: Props) => {
     const { error } = await supabase
       .from('workspace')
       .update({ locked: !item?.workspaceId?.locked })
-      .eq('id', item?.workspaceId?.id);
+      .eq('id', item?.workspaceId?.id!);
     if (!error) {
       Toast.show({
         type: 'success',

@@ -1,33 +1,36 @@
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import React, { useState } from 'react';
-import * as yup from 'yup';
-import RNPickerSelect from 'react-native-picker-select';
-import dateFormat from 'dateformat';
-import DateTimePicker from '@react-native-community/datetimepicker';
-import { FileObject } from '@supabase/storage-js';
-import * as ImagePicker from 'expo-image-picker';
-import { Button } from 'react-native-paper';
-import { useFormik } from 'formik';
-import Toast from 'react-native-toast-message';
-import { days, defaultStyle } from '../../constants';
-import { AuthHeader } from '../../components/AuthHeader';
-import { AuthTitle } from '../../components/AuthTitle';
-import { useDarkMode } from '../../hooks/useDarkMode';
-import { colors } from '../../constants/Colors';
-import { Subtitle } from '../../components/Subtitle';
-import { InputComponent } from '../../components/InputComponent';
-import { supabase } from '../../lib/supabase';
+import { Container } from '@/components/Ui/Container';
+import { useData } from '@/hooks/useData';
+import { onDeleteImage } from '@/lib/helper';
 import { FontAwesome } from '@expo/vector-icons';
-import { TouchableOpacity } from 'react-native';
-import { Image } from 'expo-image';
-import { useRouter } from 'expo-router';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import { useQueryClient } from '@tanstack/react-query';
 import { format } from 'date-fns';
-import { useData } from '@/hooks/useData';
-import { createOrg, onDeleteImage } from '@/lib/helper';
+import { Image } from 'expo-image';
+import * as ImagePicker from 'expo-image-picker';
+import { useRouter } from 'expo-router';
+import { useFormik } from 'formik';
+import React, { useState } from 'react';
+import {
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { SelectList } from 'react-native-dropdown-select-list';
-import { Select } from '@gluestack-ui/themed';
-import { Container } from '@/components/Ui/Container';
+import { Button } from 'react-native-paper';
+import Toast from 'react-native-toast-message';
+import * as yup from 'yup';
+import { AuthHeader } from '../../components/AuthHeader';
+import { AuthTitle } from '../../components/AuthTitle';
+import { InputComponent } from '../../components/InputComponent';
+import { Subtitle } from '../../components/Subtitle';
+import { days } from '../../constants';
+import { colors } from '../../constants/Colors';
+import { useDarkMode } from '../../hooks/useDarkMode';
+import { supabase } from '../../lib/supabase';
+import { useAuth } from '@clerk/clerk-expo';
 const validationSchema = yup.object().shape({
   organizationName: yup.string().required('Name of organization is required'),
   category: yup.string().required('Category is required'),
@@ -50,7 +53,7 @@ const CreateWorkSpace = (props: Props) => {
   const [endTime, setEndTime] = useState(new Date(1598051730000));
   const [avatar, setAvatar] = useState<string>('https://placehold.co/100x100');
   const [path, setPath] = useState<string>('');
-  const { id } = useData();
+  const { userId: id } = useAuth();
   const [show, setShow] = useState(false);
   const [show2, setShow2] = useState(false);
   const { darkMode } = useDarkMode();
@@ -63,6 +66,7 @@ const CreateWorkSpace = (props: Props) => {
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       base64: true,
+      quality: 0.5,
     };
 
     const result = await ImagePicker.launchImageLibraryAsync(options);
@@ -84,12 +88,11 @@ const CreateWorkSpace = (props: Props) => {
           });
 
         if (uploadError) {
-          throw uploadError.message;
-          // Toast.show({
-          //   type: 'error',
-          //   text1: 'Something went wrong',
-          //   text2: 'Please try again',
-          // });
+          Toast.show({
+            type: 'error',
+            text1: 'Something went wrong',
+            text2: uploadError.message,
+          });
         }
 
         if (!uploadError) {
@@ -167,13 +170,16 @@ const CreateWorkSpace = (props: Props) => {
           .update({
             organizationId: data?.id,
           })
-          .eq('userId', id);
+          .eq('userId', id!);
         if (!err) {
           queryClient.invalidateQueries({
-            queryKey: ['organizations', 'organization'],
+            queryKey: ['organizations'],
           });
           queryClient.invalidateQueries({
-            queryKey: ['profile', id],
+            queryKey: ['organization'],
+          });
+          queryClient.invalidateQueries({
+            queryKey: ['profile'],
           });
           resetForm();
           Toast.show({
@@ -183,7 +189,7 @@ const CreateWorkSpace = (props: Props) => {
             position: 'top',
           });
 
-          router.push(`/(app)/(organization)/${id}`);
+          router.replace(`/(app)/(organization)/${id}`);
         }
       }
 
@@ -243,7 +249,7 @@ const CreateWorkSpace = (props: Props) => {
       <ScrollView
         style={[{ flex: 1 }]}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingVertical: 20 }}
+        contentContainerStyle={{ paddingVertical: 20, flexGrow: 1 }}
       >
         <AuthHeader />
         <View style={{ marginBottom: 20 }} />
@@ -394,6 +400,7 @@ const CreateWorkSpace = (props: Props) => {
                 onChangeText={handleChange('email')}
                 placeholder="Email"
                 keyboardType="email-address"
+                autoCapitalize="none"
               />
               {touched.email && errors.email && (
                 <Text style={{ color: 'red', fontFamily: 'PoppinsMedium' }}>
@@ -405,64 +412,60 @@ const CreateWorkSpace = (props: Props) => {
               <Text style={{ marginBottom: 5, fontFamily: 'PoppinsMedium' }}>
                 Work Days
               </Text>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  gap: 10,
+
+              <SelectList
+                search={false}
+                boxStyles={{
+                  ...styles2.border,
+                  justifyContent: 'flex-start',
                   width: '100%',
                 }}
-              >
-                <>
-                  <SelectList
-                    search={false}
-                    boxStyles={{
-                      ...styles2.border,
-                      width: '100%',
-                    }}
-                    inputStyles={{
-                      textAlign: 'left',
-                      fontSize: 14,
-                      borderWidth: 0,
-                    }}
-                    fontFamily="PoppinsMedium"
-                    setSelected={handleChange('startDay')}
-                    data={days}
-                    defaultOption={{ key: 'monday', value: 'Monday' }}
-                    save="key"
-                    placeholder="Select Start Day"
-                    dropdownTextStyles={{
-                      color: darkMode === 'dark' ? 'white' : 'black',
-                    }}
-                  />
-                </>
-                <>
-                  <SelectList
-                    search={false}
-                    boxStyles={{
-                      ...styles2.border,
-                      justifyContent: 'flex-start',
-                      backgroundColor: '#E9E9E9',
-                      width: '100%',
-                    }}
-                    dropdownTextStyles={{
-                      color: darkMode === 'dark' ? 'white' : 'black',
-                    }}
-                    inputStyles={{ textAlign: 'left', fontSize: 14 }}
-                    fontFamily="PoppinsMedium"
-                    setSelected={handleChange('endDay')}
-                    data={days}
-                    defaultOption={{ key: 'friday', value: 'Friday' }}
-                    save="key"
-                    placeholder="Select End day"
-                  />
-                </>
-              </View>
+                inputStyles={{
+                  textAlign: 'left',
+                  fontSize: 14,
+                  borderWidth: 0,
+                  width: '100%',
+                }}
+                fontFamily="PoppinsMedium"
+                setSelected={handleChange('startDay')}
+                data={days}
+                defaultOption={{ key: 'monday', value: 'Monday' }}
+                save="key"
+                placeholder="Select Start Day"
+                dropdownTextStyles={{
+                  color: darkMode === 'dark' ? 'white' : 'black',
+                }}
+              />
+
+              <SelectList
+                search={false}
+                boxStyles={{
+                  ...styles2.border,
+                  justifyContent: 'flex-start',
+                  backgroundColor: '#E9E9E9',
+                  width: '100%',
+                }}
+                dropdownTextStyles={{
+                  color: darkMode === 'dark' ? 'white' : 'black',
+                }}
+                inputStyles={{
+                  textAlign: 'left',
+                  fontSize: 14,
+                  width: '100%',
+                }}
+                fontFamily="PoppinsMedium"
+                setSelected={handleChange('endDay')}
+                data={days}
+                defaultOption={{ key: 'friday', value: 'Friday' }}
+                save="key"
+                placeholder="Select End day"
+              />
             </>
             <>
               <Text style={{ marginBottom: 5, fontFamily: 'PoppinsMedium' }}>
                 Opening And Closing Time
               </Text>
-              <View style={{ flexDirection: 'row', gap: 10 }}>
+              <View style={{ gap: 10 }}>
                 <>
                   <Pressable onPress={showMode} style={styles2.border}>
                     <Text>
@@ -472,16 +475,19 @@ const CreateWorkSpace = (props: Props) => {
                   </Pressable>
 
                   {show && (
-                    <DateTimePicker
-                      display="spinner"
-                      testID="dateTimePicker"
-                      value={startTime}
-                      mode={'time'}
-                      is24Hour={true}
-                      onChange={(event, selectedDate) =>
-                        onChange(event, selectedDate, 'startTime')
-                      }
-                    />
+                    <>
+                      <DateTimePicker
+                        style={{ marginBottom: 20 }}
+                        display="spinner"
+                        testID="dateTimePicker"
+                        value={startTime}
+                        mode={'time'}
+                        is24Hour={true}
+                        onChange={(event, selectedDate) =>
+                          onChange(event, selectedDate, 'startTime')
+                        }
+                      />
+                    </>
                   )}
                 </>
                 <>
@@ -516,6 +522,7 @@ const CreateWorkSpace = (props: Props) => {
               buttonColor={colors.buttonBlue}
               textColor={colors.white}
               labelStyle={{ fontFamily: 'PoppinsMedium' }}
+              contentStyle={{ height: 50 }}
             >
               {isSubmitting ? 'Creating...' : 'Create'}
             </Button>
@@ -536,7 +543,7 @@ const styles2 = StyleSheet.create({
     justifyContent: 'center',
     borderBottomWidth: 0,
     borderBottomColor: '#DADADA',
-    width: '50%',
+    width: '100%',
   },
 });
 const styles = StyleSheet.create({
